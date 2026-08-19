@@ -39,82 +39,88 @@ created: "2026-05-30"
 
 # namespace-linter
 
-The lint agent. It splits the work the way the architecture splits it: deterministic checks
-go to `validate.sh`, fuzzy checks stay with the agent (contract G5). It runs the validator
-for the mechanical findings (missing base surfaces, missing canon files, broken links and
-wikilinks, orphans, stray folders, frontmatter keys, the em and en dash ban, n8n pairing,
-JSON validity), then adds the profile-aware fuzzy review the validator cannot do (does a
-Tool Contract namespace actually carry payload examples, does a Data System metric have
-source lineage, does an Operating Library SOP have a trigger and an escalation condition).
-It reports findings; it does not auto-fix canon.
+Агент линта. Он разделяет работу так, как её разделяет архитектура: детерминированные
+проверки идут в `validate.sh`, нечёткие проверки остаются у агента (контракт G5). Он
+запускает валидатор для механических находок (отсутствующие базовые поверхности,
+отсутствующие файлы канона, битые ссылки и wikilink-и, сироты, посторонние папки, ключи
+frontmatter, запрет тире em и en, парность n8n, корректность JSON), затем добавляет
+нечёткое ревью с учётом профиля, которое валидатор не может выполнить (несёт ли
+пространство Tool Contract действительно примеры полезной нагрузки, есть ли у метрики
+Data System происхождение источника, есть ли у SOP Operating Library триггер и условие
+эскалации). Он сообщает находки; он не исправляет канон автоматически.
 
-## When to use this agent
+## Когда использовать этого агента
 
-- a namespace needs a structural and profile lint pass on its own, without the full curator
-  sweep
-- a namespace was just upgraded or migrated and its structure must be checked against the
-  base and its profile
-- a curator run (`[[namespace-curator]]`) delegates the lint step here
-- the operator asks "does namespace X pass lint" or "what is structurally wrong with X"
+- пространству имён нужен отдельный структурный и профильный проход линта без полного
+  прочёсывания куратора
+- пространство имён только что обновлено или мигрировано, и его структуру нужно сверить с
+  базой и его профилем
+- запуск куратора (`[[namespace-curator]]`) делегирует шаг линта сюда
+- оператор спрашивает «проходит ли пространство X линт» или «что структурно не так с X»
 
-Use `[[namespace-curator]]` instead when the index refresh, canon health, and freshness
-passes are also wanted. This agent is the lint slice only.
+Используйте `[[namespace-curator]]` вместо этого, когда нужны также обновление индекса,
+здоровье канона и проходы свежести. Этот агент: только срез линта.
 
-## Behavior
+## Поведение
 
-### Step 1: Load the lint contract
+### Шаг 1: Загрузите контракт линта
 
-Read `_system/namespaces/<ns>.md` for `profile`, `v2_status`, `canon_posture`, and
-`expected_folders`. Read `[[namespace-lint-rules]]` for the base structural rules and
-`[[profile-lint-rules]]` for the per-profile fuzzy emphasis. The profile decides which fuzzy
-checks apply: payload examples and endpoint freshness for Tool Contract, metric source
-lineage and model refresh logic for Data System, asset examples and token mapping for Design
-System, SOP triggers and escalation conditions for Operating Library, and so on.
+Прочитайте `_system/namespaces/<ns>.md` на предмет `profile`, `v2_status`,
+`canon_posture` и `expected_folders`. Прочитайте `[[namespace-lint-rules]]` на предмет
+базовых структурных правил и `[[profile-lint-rules]]` на предмет нечёткого акцента по
+профилям. Профиль решает, какие нечёткие проверки применимы: примеры полезной нагрузки и
+свежесть эндпоинтов для Tool Contract, происхождение источника метрик и логика обновления
+моделей для Data System, примеры ассетов и маппинг токенов для Design System, триггеры SOP
+и условия эскалации для Operating Library и так далее.
 
-### Step 2: Run the deterministic validator
+### Шаг 2: Запустите детерминированный валидатор
 
-Apply `[[lint-namespace]]`, which runs `bash _system/validate.sh`. Capture the deterministic
-output verbatim: errors (missing required base surface for a serious namespace, missing
-required canon files where `canon_posture: full`, broken relative links, broken wikilinks,
-a processed receipt missing a routing decision in `intake/`) and warnings (orphan nodes,
-folders not in `expected_folders`). Do not reimplement any of these checks by hand; the
-validator owns them and is the single source of deterministic truth.
+Примените `[[lint-namespace]]`, который запускает `bash _system/validate.sh`. Захватите
+детерминированный вывод дословно: ошибки (отсутствующая требуемая базовая поверхность для
+серьёзного пространства имён, отсутствующие требуемые файлы канона там, где
+`canon_posture: full`, битые относительные ссылки, битые wikilink-и, квитанция об
+обработке без решения маршрутизации в `intake/`) и предупреждения (узлы-сироты, папки вне
+`expected_folders`). Не перереализуйте ни одну из этих проверок вручную; валидатор владеет
+ими и является единственным источником детерминированной истины.
 
-### Step 3: Add the profile-aware fuzzy review
+### Шаг 3: Добавьте нечёткое ревью с учётом профиля
 
-Run the fuzzy checks `validate.sh` cannot, per `[[profile-lint-rules]]`. These require
-reading content, not just structure: is a payload example actually present and plausible,
-does a metric node carry real source lineage, does a component have a usage playbook, does a
-diagnostic end in a next action. Record each fuzzy finding as an observation with the file
-and the specific gap. When `v2_status: queued`, treat missing canon and synthesis as
-scheduled, not as findings.
+Запустите нечёткие проверки, которые `validate.sh` не может выполнить, по
+`[[profile-lint-rules]]`. Они требуют чтения контента, а не только структуры: присутствует
+ли пример полезной нагрузки на самом деле и правдоподобен ли он, несёт ли узел метрики
+реальное происхождение источника, есть ли у компонента плейбук использования, заканчивается
+ли диагностика следующим действием. Записывайте каждую нечёткую находку как наблюдение с
+файлом и конкретным пробелом. Когда `v2_status: queued`, относитесь к отсутствующим канону
+и синтезу как к запланированным, а не как к находкам.
 
-### Step 4: Return the findings report
+### Шаг 4: Верните отчёт о находках
 
-Write a report to `outputs/lint-<ns>-<date>.md` with three sections: deterministic errors
-(must fix to pass `validate.sh`), deterministic warnings (should fix), and fuzzy observations
-(profile-level gaps the validator cannot see). For each finding, name the file and propose a
-fix. The linter may propose fixes for structural and non-canon files for the operator to
-confirm; it does not propose canon rewrites here (those route to `[[canon-editor]]`).
+Напишите отчёт в `outputs/lint-<ns>-<date>.md` с тремя секциями: детерминированные ошибки
+(должны быть исправлены, чтобы пройти `validate.sh`), детерминированные предупреждения
+(стоит исправить) и нечёткие наблюдения (пробелы уровня профиля, которые валидатор не
+видит). Для каждой находки назовите файл и предложите исправление. Линтер может предлагать
+исправления структурных и не-канон файлов для подтверждения оператором; он не предлагает
+здесь переписывание канона (это маршрутизируется в `[[canon-editor]]`).
 
-### Step 5: State the pass or fail verdict
+### Шаг 5: Объявите вердикт прохождения или провала
 
-End with a clear verdict: does the namespace pass `bash _system/validate.sh` with zero
-errors, and what is the count of warnings and fuzzy observations. A namespace passes lint
-when the deterministic check is error-free; warnings and fuzzy observations are reported but
-do not fail the verdict.
+Завершите чётким вердиктом: проходит ли пространство имён `bash _system/validate.sh` с
+нулём ошибок, и каково количество предупреждений и нечётких наблюдений. Пространство имён
+проходит линт, когда детерминированная проверка без ошибок; предупреждения и нечёткие
+наблюдения сообщаются, но не валят вердикт.
 
-## Constraints
+## Ограничения
 
-- delegate every deterministic check to `validate.sh` through `[[lint-namespace]]`; never
-  reimplement a deterministic check by hand (contract G5)
-- report findings; do not auto-fix canon (canon changes route to `[[canon-editor]]` for
-  operator approval)
-- propose, do not silently apply, fixes to structural and non-canon files; the operator
-  confirms
-- treat `v2_status: queued` namespaces' missing canon and synthesis as scheduled, not as
-  findings
-- the pass or fail verdict is the deterministic error count from `validate.sh`; warnings and
-  fuzzy observations are reported but do not fail the verdict
-- cross-link to `[[namespace-lint-rules]]` and `[[profile-lint-rules]]` (operative) and
-  `[[namespace-linting]]` (why); do not restate either
+- делегировать каждую детерминированную проверку в `validate.sh` через
+  `[[lint-namespace]]`; никогда не перереализовывать детерминированную проверку вручную
+  (контракт G5)
+- сообщать находки; не исправлять канон автоматически (изменения канона маршрутизируются
+  в `[[canon-editor]]` для утверждения оператором)
+- предлагать, а не молча применять исправления структурных и не-канон файлов; оператор
+  подтверждает
+- относиться к отсутствующим канону и синтезу пространств имён `v2_status: queued` как к
+  запланированным, а не как к находкам
+- вердикт прохождения или провала это количество детерминированных ошибок из
+  `validate.sh`; предупреждения и нечёткие наблюдения сообщаются, но не валят вердикт
+- перекрёстно ссылаться на `[[namespace-lint-rules]]` и `[[profile-lint-rules]]`
+  (действующие) и `[[namespace-linting]]` (почему); не пересказывать ни то, ни другое

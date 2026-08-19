@@ -33,18 +33,18 @@ runtime: "agentic"
 
 # Workflow: Weekly Review
 
-A reasoning pipeline for a structured weekly review. Run this in a Claude Code session
+A reasoning pipeline for a structured weekly review. Run this in a Qwen Code session
 at the end of each work week. It produces a review Output and optionally creates new
 Memory nodes from lessons learned.
 
 ## When to run
 
 End of week, ideally Friday afternoon before you close out. Takes roughly 15 minutes
-of your attention plus Claude Code time.
+of your attention plus Qwen Code time.
 
 ## Inputs
 
-- The current date (Claude Code reads this automatically).
+- The current date (Qwen Code reads this automatically).
 - Your `projects/` folder (current state of all projects).
 - Your `intake/` folder (any items not yet triaged this week, plus the root `intake/`
   fabric: `sources/`, `processed/`, and `routing/`).

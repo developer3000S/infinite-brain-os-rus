@@ -1,43 +1,52 @@
-# Start Here
+# Начните здесь
 
-The first note to open, whether you arrived through Obsidian, an AI agent, or a terminal.
+Первая заметка, которую нужно открыть, независимо от того, пришли ли вы через Obsidian,
+ИИ-агента или терминал.
 
-New machine? The README's Prerequisites section lists the small tool set you need first
-(git, a bash shell, an AI coding agent, a GitHub account).
+Новая машина? Раздел «Предварительные требования» в README перечисляет небольшой набор
+инструментов, который нужен сначала (git, оболочка bash, ИИ-агент для кодирования,
+учётная запись GitHub). 
 
-## First fifteen minutes
+**Важно:** Проект настроен для работы с Qwen Code в качестве основной среды исполнения. 
+Используйте `QWEN.md` для ориентации при работе с Qwen Code, или `AGENTS.md` для работы с Codex/Claude Code.
 
-1. Read `README.md` for what this OS is and the folder map.
-2. Take the example tour in the README: eight short files that show every entity type
-   working together around a fictional candle studio.
-3. Read `knowledge/ai-architecture/canon/doctrine-card.md`: the one-page projection of the
-   whole architecture. Drill into `canon/core-doctrine.md` when you want the full why.
-4. Run `bash _system/validate.sh`. It exits 0 with "All checks passed" on a fresh clone;
-   keep it that way. It also prints a small set of known warnings on the shipped example
-   content: those ship in the box and are not yours to fix. Errors are yours.
-5. Read `docs/getting-started.md` and do the walkthrough: read canon, run a command,
-   create a note, promote it.
+## Первые пятнадцать минут
 
-## What this repo is for
+1. Прочитайте `README.md`, чтобы понять, что это за ОС, и посмотрите карту папок.
+2. Пройдите экскурсию по примеру из README: восемь коротких файлов, показывающих все типы
+   сущностей, работающие вместе вокруг вымышленной студии свечей.
+3. Прочитайте `knowledge/ai-architecture/canon/doctrine-card.md`: одностраничную проекцию
+   всей архитектуры. Углубитесь в `canon/core-doctrine.md`, когда захотите полное «почему».
+4. Запустите `bash _system/validate.sh`. На свежем клоне он завершается с exit 0 и
+   сообщением "All checks passed"; сохраняйте это состояние. Он также печатает небольшой
+   набор известных предупреждений на поставляемом примере контента: они входят в поставку,
+   и не вам их исправлять. Ошибки: ваши.
+5. Прочитайте `docs/getting-started.md` и пройдите пошаговое руководство: прочитайте канон,
+   выполните команду, создайте заметку, продвиньте её.
 
-Your business's brain: the knowledge, decisions, rules, and procedures your AI agents read
-before acting, and the audit trail of what they did. You own every file. The agent vendors
-are adapters, not owners.
+## Для чего этот репозиторий
 
-## What to avoid
+Это мозг вашего бизнеса: знания, решения, правила и процедуры, которые ваши ИИ-агенты
+читают перед действием, и журнал аудита того, что они сделали. Вы владеете каждым файлом.
+Вендоры агентов: адаптеры, а не владельцы.
 
-- Do not skip frontmatter when creating entities; the validator will tell you.
-- Do not let an agent promote its own work to canon; promotion is yours.
-- Do not store live numbers, live queues, or secret values here; pointers only.
+**Новая структура адаптеров:** Проект теперь использует `.qwen/` в качестве основной директории адаптера для Qwen Code.
+Директории `.claude/` и `.codex/` также поддерживаются для обратной совместимости.
 
-## Where to go next
+## Чего избегать
 
-- Main browse note (Obsidian): `OBSIDIAN-DASHBOARD.md`
-- The walkthrough: `docs/getting-started.md`
-- Map your business onto the OS: `docs/onboard-business.md`
-- The intake flow: `intake/README.md`
-- The architecture: `knowledge/ai-architecture/INDEX.md`
-- The OS as an OODA loop (start with the visual):
-  `docs/ooda-infinite-brain-map.html`, then
+- Не пропускайте frontmatter при создании сущностей; валидатор вам скажет.
+- Не позволяйте агенту продвигать собственную работу в канон; продвижение: за вами.
+- Не храните здесь живые числа, живые очереди или значения секретов; только указатели.
+
+## Куда дальше
+
+- Главная заметка для просмотра (Obsidian): `OBSIDIAN-DASHBOARD.md`
+- Пошаговое руководство: `docs/getting-started.md`
+- Наложить ваш бизнес на ОС: `docs/onboard-business.md`
+- Поток входящих данных: `intake/README.md`
+- Архитектура: `knowledge/ai-architecture/INDEX.md`
+- ОС как цикл OODA (начните с визуальной схемы):
+  `docs/ooda-infinite-brain-map.html`, затем
   `knowledge/ai-architecture/synthesis/ooda-architecture-index.md`
-- Namespace rules: `_system/namespaces/INDEX.md`
+- Правила пространств имён: `_system/namespaces/INDEX.md`

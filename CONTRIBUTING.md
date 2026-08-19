@@ -1,35 +1,36 @@
-# Contributing
+# Вклад
 
-Thanks for considering a contribution. This repo is a starter template: most of your work
-on it should happen in your own clone, for your own business. Contributions here improve
-the template everyone starts from.
+Спасибо, что рассматриваете возможность внести вклад. Этот репозиторий: стартовый шаблон:
+большая часть вашей работы над ним должна происходить в вашем собственном клоне, для
+вашего собственного бизнеса. Вклад здесь улучшает шаблон, с которого начинают все.
 
-## What makes a good contribution
+## Что делает вклад хорошим
 
-- Fixes to the contract layer: validator bugs, schema gaps, clearer rules.
-- Better teaching material: sharper examples, clearer doctrine wording, walkthrough fixes.
-- New profile references in `knowledge/_examples/` that show a namespace pattern the
-  current eight do not cover.
-- Builder improvements: skills and workflows that scaffold better.
+- Исправления слоя контракта: баги валидатора, пробелы в схемах, более ясные правила.
+- Лучший обучающий материал: более чёткие примеры, более ясные формулировки доктрины,
+  исправления пошаговых руководств.
+- Новые справочники профилей в `knowledge/_examples/`, которые показывают паттерн
+  пространства имён, который текущие восемь не покрывают.
+- Улучшения конструкторов: навыки и рабочие процессы, которые создают лучшие каркасы.
 
-## What we will decline
+## Что мы отклоним
 
-- Anything that stores live data, secrets, or vendor credentials in the repo.
-- Examples tied to a real company, product, or person. The example world is fictional on
-  purpose.
-- Em dashes. The voice rule (`entities/rules/voice-and-style.md`) bans them, and the
-  validator enforces it.
+- Всё, что хранит живые данные, секреты или учётные данные вендоров в репозитории.
+- Примеры, привязанные к реальной компании, продукту или человеку. Примерный мир
+  вымышлен намеренно.
+- Тире em. Правило голоса (`entities/rules/voice-and-style.md`) запрещает их, и
+  валидатор это контролирует.
 
-## The bar
+## Требования
 
-1. `bash _system/validate.sh` exits 0 with your change in place.
-2. New node-bearing files carry full frontmatter (id, aliases, type, namespace,
+1. `bash _system/validate.sh` завершается с exit 0 с вашим изменением на месте.
+2. Новые файлы-узлы несут полный frontmatter (id, aliases, type, namespace,
    lifecycle_state, summary, confidence, retrieval_class, export_class, edges, created).
-3. New entities follow the canonical-plus-shim pattern: the file lives in `entities/`,
-   `bash sync-adapters.sh` regenerates the `.claude/` and `.codex/` shims.
-4. Voice per `entities/rules/voice-and-style.md`: direct, specific, active, short.
+3. Новые сущности следуют паттерну «канонический плюс прокладка»: файл живёт в
+   `entities/`, `bash sync-adapters.sh` пересоздаёт прокладки `.claude/` и `.codex/`.
+4. Голос по `entities/rules/voice-and-style.md`: прямой, конкретный, активный, короткий.
 
-## How
+## Как внести вклад
 
-Open a pull request with a one-paragraph description of what the change teaches or fixes.
-Small and focused beats large and sweeping.
+Откройте pull request с описанием длиной в один абзац о том, чему учит или что исправляет
+изменение. Маленькое и сфокусированное побеждает большое и размашистое.

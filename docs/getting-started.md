@@ -1,13 +1,13 @@
 # Getting Started
 
 A thirty-minute walkthrough that touches every part of the OS once, using only files inside
-this repo. Do it with your AI agent open (Claude Code or Codex) in the repo root.
+this repo. Do it with your AI agent open (Qwen Code or Codex) in the repo root.
 
 ## 0. Before you start
 
 You need git, a bash shell (on Windows: the Git Bash terminal that ships with Git for
 Windows, not cmd or PowerShell), and an AI coding agent such as
-[Claude Code](https://claude.com/claude-code). The README's Prerequisites section covers
+[Qwen Code](https://github.com/QwenLM/qwen-code.git) or Codex. The README's Prerequisites section covers
 the details, including the optional pieces (`gh`, `python3`, Obsidian).
 
 ## 1. Prove the contract (two minutes)
@@ -52,7 +52,7 @@ Run the studio-brief command as if you were the studio's assistant. The orders l
 fictional, so improvise plausible numbers and mark them as such.
 ```
 
-The agent reads `entities/commands/studio-brief.md` (through its `.claude/commands/` shim),
+The agent reads `entities/commands/studio-brief.md` (through its `.qwen/commands/` or `.codex/commands/` shim),
 follows its reading list, and produces a brief into `outputs/` with lineage frontmatter.
 That round trip (command, reads, output with lineage) is the execution pattern for
 everything here.
@@ -84,7 +84,7 @@ refining). The next states, candidate and canon, require your sign-off, never th
 
 ## 6. Close the loop (five minutes)
 
-If your agent registered a session at the start (the forced startup in CLAUDE.md makes it),
+If your agent registered a session at the start (the forced startup in QWEN.md makes it),
 ask it to close out: a review in `sessions/reviews/`, the record moved to
 `sessions/closed/`. Read the closeout. That audit trail is what makes agent work in this
 repo recoverable and reviewable.

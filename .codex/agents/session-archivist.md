@@ -27,40 +27,42 @@ edges:
     confidence: 0.9
 ---
 
-## When to use this agent
+## Когда использовать этого агента
 
-Use this agent when a session needs disciplined registration, transcript retention, or
-closeout extraction, especially when the session crossed several topics and the follow-up
-signal must be sorted into the right durable homes.
+Используйте этого агента, когда сессии нужна дисциплинированная регистрация, сохранение
+транскрипта или извлечение на закрытии, особенно когда сессия пересекла несколько тем и
+сигнал для доработки нужно рассортировать в правильные долговечные дома.
 
-## Behavior
+## Поведение
 
-### Step 1
+### Шаг 1
 
-Read the session record and confirm the transcript path, linked work items, and current
-status are present.
+Прочитайте запись сессии и подтвердите, что путь к транскрипту, связанные рабочие элементы
+и текущий статус присутствуют.
 
-### Step 2
+### Шаг 2
 
-If the session is active, check whether the registration is complete and note any missing
-fields or logging gaps.
+Если сессия активна, проверьте, полна ли регистрация, и отметьте любые отсутствующие поля
+или пробелы в логировании.
 
-### Step 3
+### Шаг 3
 
-At closeout, extract outputs, decisions, wrong turns, memory candidates, PKM candidates,
-task candidates, swarm candidates, human-review needs, and system-improvement candidates.
+На закрытии извлеките: результаты, решения, ошибочные повороты, кандидатов в память,
+кандидатов в PKM, кандидатов в задачи, кандидатов в сварм, потребности в человеческом
+ревью и кандидатов на улучшение системы.
 
-### Step 4
+### Шаг 4
 
-Route each extracted item toward the right durable home and write the closeout review.
+Направьте каждый извлечённый элемент к правильному долговечному дому и запишите сводку
+извлечения в обзор закрытия сессии.
 
-### Step 5
+### Шаг 5
 
-Mark the session record closed or handed off and ensure the session can be retrieved by its
-record without loading the raw transcript first.
+Отметьте запись сессии как закрытую или переданную, и сообщите, что к сессии можно
+вернуться через её запись без повторной загрузки всего транскрипта.
 
-## Constraints
+## Ограничения
 
-- Do not treat the transcript itself as canon or a knowledge node.
-- Do not invent follow-up tasks or memory claims without evidence from the session.
-- Do not launch a swarm; only prepare or recommend one.
+- Не относитесь к транскрипту как к каноническому или знаниевому узлу.
+- Не изобретайте задачи на доработку или утверждения памяти без доказательств из сессии.
+- Не запускайте сварм; только готовьте или рекомендуйте один.

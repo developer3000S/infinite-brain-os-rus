@@ -18,47 +18,71 @@ created: "2026-05-20"
 
 # /promote
 
-Promote a node from this personal repo to a department or company-canon repo. The command rewrites the frontmatter to match the target repo's conventions, scans wikilinks for cross-repo references, copies the file into a working branch in the target repo's clone, and opens a pull request for the canonization gate to review.
+Продвигает узел из этого личного репозитория в репозиторий департамента или
+корпоративного канона. Команда переписывает frontmatter под соглашения целевого
+репозитория, сканирует wikilink-ссылки на межрепозиторные ссылки, копирует файл в рабочую
+ветку в клоне целевого репозитория и открывает pull request для рассмотрения гейтом
+канонизации.
 
-## Usage
+## Использование
 
 ```
 /promote path/to/node.md target=department
 /promote path/to/node.md target=company-canon
 ```
 
-The first argument is the path to the node file in this repo (for example, `knowledge/personal-operator/playbooks/attribution-standard.md`). The `target` argument names which canon repo to promote into.
+Первый аргумент: путь к файлу узла в этом репозитории (например,
+`knowledge/personal-operator/playbooks/attribution-standard.md`). Аргумент `target`
+называет, в какой канон-репозиторий продвигать.
 
-## What this command does
+## Что делает эта команда
 
-1. Reads the source node file and verifies it has `lifecycle_state: research`. Any other state is a refusal. `scratch` is too early. `candidate` and `canon` are already promoted. `archive` should be reopened first.
-2. Looks up the target repo path. Convention: the target repo is cloned as a sibling directory next to this personal repo (for example, `../acme-marketing/` for `target=department` or `../acme-company-canon/` for `target=company-canon`). If the sibling is not present, the command fails with a clear message ("clone the target repo as a sibling before running /promote").
-3. Delegates to ``skill-cross-repo-move`` for the file-move, frontmatter-rewrite, and wikilink-resolution mechanics.
-4. Opens a pull request against the target repo via `gh pr create`. PR title: `promote: {node-id}`. PR body: a summary of what is being promoted, the source node id, the source repo, and a checklist for the reviewer.
+1. Читает файл исходного узла и проверяет, что у него `lifecycle_state: research`. Любое
+   другое состояние: отказ. `scratch` слишком рано. `candidate` и `canon` уже продвинуты.
+   `archive` нужно сначала открыть заново.
+2. Находит путь целевого репозитория. Соглашение: целевой репозиторий клонируется как
+   соседняя директория рядом с этим личным репозиторием (например, `../acme-marketing/`
+   для `target=department` или `../acme-company-canon/` для `target=company-canon`). Если
+   соседа нет, команда завершается с понятным сообщением («склонируйте целевой
+   репозиторий как соседа перед запуском /promote»).
+3. Делегирует механику перемещения файла, перезаписи frontmatter и резолва wikilink-ов в
+   `[[skill-cross-repo-move]]`.
+4. Открывает pull request в целевом репозитории через `gh pr create`. Заголовок PR:
+   `promote: {node-id}`. Тело PR: сводка того, что продвигается, id исходного узла,
+   исходный репозиторий и чек-лист для ревьюера.
 
-## Frontmatter rewrite rules
+## Правила перезаписи frontmatter
 
-The command applies these rewrites to the moved file:
+Команда применяет к перемещённому файлу такие перезаписи:
 
-| Field | Source value | Target value |
-|-------|--------------|--------------|
+| Поле | Значение источника | Значение цели |
+|------|--------------------|---------------|
 | `lifecycle_state` | `research` | `candidate` |
-| `namespace` | `personal-operator` | depends on target: `canon-department` or `canon-company` |
-| `local_path` | path in personal repo | path in target repo |
+| `namespace` | `personal-operator` | зависит от цели: `canon-department` или `canon-company` |
+| `local_path` | путь в личном репозитории | путь в целевом репозитории |
 
-For nodes that already have richer frontmatter (`visibility`, `owner_type`, `export_class`), the command preserves those fields but normalizes them to the target repo's defaults (for example, `visibility: workspace`, `owner_type: team` for department, `owner_type: company` for company-canon).
+Для узлов, у которых уже есть более богатый frontmatter (`visibility`, `owner_type`,
+`export_class`), команда сохраняет эти поля, но нормализует их под значения по умолчанию
+целевого репозитория (например, `visibility: workspace`, `owner_type: team` для
+департамента, `owner_type: company` для company-canon).
 
-## Wikilink resolution
+## Резолв wikilink-ов
 
-The command scans the body of the file for in-body `[[wikilinks]]`. For each:
+Команда сканирует тело файла на встроенные `[[wikilink]]`-ссылки. Для каждой:
 
-1. If the wikilink points to a node that exists in this personal repo only and is not being promoted in this PR, the link is flagged in the PR description: "this promotion references a personal-repo-only node; the reviewer should decide whether to inline the reference, exclude the dependency, or open a follow-up promote for that node."
-2. If the wikilink points to a node that already exists in the target repo, the link is preserved as-is.
-3. If the wikilink points to a node in the other canon repo (for example, promoting to department but the link points at company-canon), the link is preserved. Cross-canon references are valid.
+1. Если wikilink указывает на узел, который существует только в этом личном репозитории
+   и не продвигается в этом PR, ссылка помечается в описании PR: «это продвижение
+   ссылается на узел только личного репозитория; ревьюер должен решить, встроить ссылку,
+   исключить зависимость или открыть отдельный promote для этого узла».
+2. Если wikilink указывает на узел, который уже существует в целевом репозитории, ссылка
+   сохраняется как есть.
+3. Если wikilink указывает на узел в другом канон-репозитории (например, продвижение в
+   департамент, а ссылка ведёт в company-canon), ссылка сохраняется. Межканонные ссылки
+   допустимы.
 
-## PR description template
+## Шаблон описания PR
 
-The command generates a PR description using this template:
+Команда генерирует описание PR по этому шаблону:
 
 ```markdown
 ## Promotion of {node-id}
@@ -84,15 +108,24 @@ The command generates a PR description using this template:
 - [ ] Reviewer accepts the promotion and merges, moving lifecycle to `canon`
 ```
 
-## Edge cases
+## Крайние случаи
 
-- **Target repo is not cloned as a sibling**: fail with a clear message listing the expected path and a suggested `git clone` command.
-- **Source node has `lifecycle_state` other than `research`**: refuse with a message stating the required prerequisite and the lifecycle progression rules.
-- **Source node has missing required frontmatter fields**: refuse and list the missing fields. Suggest running `bash _system/validate.sh` if installed, or fixing by hand.
-- **Existing file with the same id in the target repo**: refuse and propose either renaming the source node or opening an UPDATE PR against the existing canonical file instead.
-- **Network or `gh` CLI unavailable**: complete the file copy and frontmatter rewrite locally, then emit instructions for opening the PR by hand.
+- **Целевой репозиторий не склонирован как сосед**: завершиться с понятным сообщением,
+  перечисляющим ожидаемый путь и предлагаемую команду `git clone`.
+- **У исходного узла `lifecycle_state` не `research`**: отказать с сообщением о требуемой
+  предпосылке и правилах продвижения жизненного цикла.
+- **У исходного узла отсутствуют обязательные поля frontmatter**: отказать и перечислить
+  отсутствующие поля. Предложить запустить `bash _system/validate.sh`, если он установлен,
+  или исправить вручную.
+- **В целевом репозитории уже есть файл с тем же id**: отказать и предложить либо
+  переименовать исходный узел, либо открыть UPDATE PR против существующего канонического
+  файла.
+- **Сеть или CLI `gh` недоступны**: выполнить копирование файла и перезапись frontmatter
+  локально, затем выдать инструкции для открытия PR вручную.
 
-## Notes
+## Примечания
 
-- This command does not delete the source file from the personal repo. The reviewer or the operator may delete it after the candidate is merged to canon, or may keep it as a working copy.
-- The command always operates on a fresh git branch in the target repo (auto-named `promote/{node-id}`), never against the default branch.
+- Эта команда не удаляет исходный файл из личного репозитория. Ревьюер или оператор может
+  удалить его после слияния кандидата в канон или оставить как рабочую копию.
+- Команда всегда работает в свежей git-ветке целевого репозитория (автоназвание
+  `promote/{node-id}`), никогда против ветки по умолчанию.

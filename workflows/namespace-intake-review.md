@@ -57,7 +57,7 @@ judgment-lane residue becomes a scored `observation` that enters the lifecycle. 
 
 ## Inputs
 
-- The current date (Claude Code reads this automatically).
+- The current date (Qwen Code reads this automatically).
 - `intake/sources/` (captured source records, one folder per source family).
 - `intake/processed/` (existing receipts, used to detect what is already processed).
 - `intake/routing/destination-rules.md`, `intake/routing/namespace-routing-map.md`, and

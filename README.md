@@ -1,181 +1,192 @@
 # Infinite Brain OS
 
-A git-backed operating system for running a business with AI agents. Plain Markdown and
-YAML, readable by any file-reading agent, owned by you.
+Операционная система на базе git для ведения бизнеса с помощью ИИ-агентов. Простые
+Markdown и YAML, читаемые любым файловым агентом, в вашей полной собственности.
 
-The Infinite Brain is a knowledge OS: it makes what your business knows, decides, and does
-reliably retrievable and safely executable by AI agents, today and after the tools change.
-Knowledge lives in namespaces with an explicit promotion path to operator-approved canon.
-Work lives in projects with typed entities (commands, agents, skills, rules, workflows,
-tools). A contract layer (`_system/`) plus a validator keeps the whole graph honest. Your
-AI coding agent (Claude Code, Codex, or any file-reading agent) is the runtime.
+Infinite Brain это операционная система знаний: она делает то, что ваш бизнес знает,
+решает и делает, надёжно извлекаемым и безопасно исполняемым ИИ-агентами, сегодня и
+после смены инструментов. Знания живут в пространствах имён (namespaces) с явным путём
+продвижения к канону, утверждённому оператором. Работа живёт в проектах с типизированными
+сущностями (команды, агенты, навыки, правила, рабочие процессы, инструменты). Слой
+контракта (`_system/`) вместе с валидатором держит весь граф честным. Ваш ИИ-агент для
+кодирования (Qwen Code, Codex или любой файловый агент) это среда исполнения.
 
-No database, no server, no vendor lock-in. If you can read this repo, so can your agents.
+Никакой базы данных, никакого сервера, никакой привязки к вендору. Если вы можете
+прочитать этот репозиторий, смогут и ваши агенты.
 
-## Prerequisites
+## Предварительные требования
 
-Four things before the quickstart:
+Четыре вещи до быстрого старта:
 
-- **Git.** Windows: install [Git for Windows](https://git-scm.com/download/win), which
-  includes Git Bash. macOS: run `git --version` in Terminal and accept the command line
-  tools install if prompted. Linux: `apt install git` or your distro's equivalent.
-- **A bash shell.** Windows: use the Git Bash terminal that ships with Git for Windows
-  (or WSL if you prefer); plain cmd or PowerShell cannot run the validator. macOS and
-  Linux: the built-in terminal works, and the validator runs on the stock macOS bash.
-- **An AI coding agent.** [Claude Code](https://claude.com/claude-code) is the primary
-  runtime (it needs a paid Anthropic plan; follow its own install guide). Codex or any
-  file-reading agent also works.
-- **A GitHub account** (or another git host), so your brain can back up to a private
-  remote of your own. The [GitHub CLI](https://cli.github.com/) (`gh`) makes
-  authentication easier but is optional.
+- **Git.** Windows: установите [Git for Windows](https://git-scm.com/download/win), в
+  состав которого входит Git Bash. macOS: выполните `git --version` в Терминале и примите
+  установку инструментов командной строки, если появится запрос. Linux: `apt install git`
+  или аналог вашего дистрибутива.
+- **Оболочка bash.** Windows: используйте терминал Git Bash, поставляемый с Git for
+  Windows (или WSL, если предпочитаете); обычные cmd или PowerShell не смогут запустить
+  валидатор. macOS и Linux: встроенный терминал подходит, валидатор работает на штатном
+  bash macOS.
+- **ИИ-агент для кодирования.** [Qwen Code](https://github.com/QwenLM/qwen-code.git): основная
+  среда исполнения (рекомендуется). Codex, Claude Code или любой файловый агент тоже подходят.
+- **Учётная запись GitHub** (или другой git-хостинг), чтобы ваш мозг мог делать резервные
+  копии в ваш приватный удалённый репозиторий. [GitHub CLI](https://cli.github.com/)
+  (`gh`) упрощает аутентификацию, но не обязателен.
 
-Also optional: `python3` speeds the validator up (it falls back to awk without it), and
-[Obsidian](https://obsidian.md/) gives you the graph view. Neither is required.
+Также опционально: `python3` ускоряет валидатор (без него он откатывается на awk), а
+[Obsidian](https://obsidian.md/) даёт вид графа. Ни то, ни другое не требуется.
 
-## Quickstart
+## Быстрый старт
 
 ```bash
 git clone https://github.com/starmynd-org/infinite-brain-os.git my-brain && cd my-brain
-bash _system/validate.sh     # exit 0 and "All checks passed" on a fresh clone
-claude                       # or your agent of choice; CLAUDE.md orients it
+bash _system/validate.sh     # exit 0 и "All checks passed" на свежем клоне
+qwen-code                     # основной агент; QWEN.md его ориентирует
 ```
 
-The validator prints a small set of known warnings on the shipped example content; that
-warning set is part of the box. Errors are the contract: a fresh clone has zero, and
-every change you make must keep it that way.
+**Примечание:** Проект настроен для работы с Qwen Code в качестве основной среды исполнения. При первом запуске Qwen Code прочитает `QWEN.md` для ориентации. Для использования Codex или Claude Code прочитайте `AGENTS.md`.
 
-Then say to your agent:
+Валидатор печатает небольшой известный набор предупреждений на поставляемом примере
+контента; этот набор предупреждений: часть поставки. Ошибки это контракт: у свежего
+клона их ноль, и каждое ваше изменение должно сохранять это состояние.
+
+Затем скажите своему агенту:
 
 ```
 Read START-HERE.md and give me the tour.
 ```
 
-Or open the folder as an Obsidian vault (config ships in `.obsidian/`) and read
-`START-HERE.md` yourself. The full walkthrough is `docs/getting-started.md`.
+Или откройте папку как хранилище Obsidian (конфиг поставляется в `.obsidian/`) и прочитайте
+`START-HERE.md` сами. Полное пошаговое руководство: в `docs/getting-started.md`.
 
-## What ships in the box
+## Что входит в поставку
 
-- **The contract layer.** `_system/` holds the schemas, rules, registries, and
-  `validate.sh`: what must be true in this repo and how it is checked.
-- **The doctrine.** `knowledge/ai-architecture/` is the full reference architecture: the
-  control spine, the namespace model, canon versus synthesis, retrieval doctrine, surface
-  boundaries, and the agent-authority limits. It is the "why" behind every folder here.
-- **The OODA orientation set.** How the whole OS reads as John Boyd's real OODA web:
-  the bridge, the feedback-plane spec, and a router index in
-  `knowledge/ai-architecture/synthesis/`, the wager-ledger design that closes the
-  Act-to-Orient arrow, and an interactive visual explainer
+- **Слой контракта.** `_system/` содержит схемы, правила, реестры и `validate.sh`: что
+  должно быть истинно в этом репозитории и как это проверяется.
+- **Доктрина.** `knowledge/ai-architecture/` это полная эталонная архитектура: опорный
+  стержень, модель пространств имён, канон против синтеза, доктрина извлечения, границы
+  поверхностей и пределы полномочий агентов. Это «почему» за каждой папкой здесь.
+- **Набор ориентации OODA.** Как вся ОС читается как настоящая OODA-сеть Джона Бойда:
+  мост, спецификация плоскости обратной связи и индекс маршрутизатора в
+  `knowledge/ai-architecture/synthesis/`, дизайн реестра ставок (wager ledger),
+  замыкающий стрелку «Действие-Ориентация», и интерактивная визуальная схема
   (`docs/ooda-infinite-brain-map.html`).
-- **A complete worked example.** A fictional candle studio (Emberline) threads through one
-  example of every entity type, all cross-linked: a command, an agent, a skill, a rule, two
-  workflows (agentic and deterministic), a tool, a tiny knowledge namespace, a data pointer,
-  a memory, an output, a filled project, and an assembled department.
-- **Builders.** Skills and workflows that scaffold new namespaces, departments, projects,
-  agents, and knowledge bases, plus an onboarding interview (`docs/onboard-business.md`)
-  that maps your business onto the architecture.
-- **Eight profile references.** `knowledge/_examples/` shows the eight namespace profiles
-  (doctrine, data-system, design-system, content-strategy, tool-contract, and more) as
-  copyable scaffolds.
-- **Provenance.** `PROVENANCE.yml` at the repo root records the exact source commit, export
-  date, and pipeline version this release derives from, machine-readable.
+- **Полный проработанный пример.** Вымышленная студия свечей (Emberline) проходит через
+  один пример каждого типа сущности, все перекрёстно связанные: команда, агент, навык,
+  правило, два рабочих процесса (агентный и детерминированный), инструмент, небольшое
+  пространство знаний, указатель данных, память, результат, заполненный проект и
+  собранный департамент.
+- **Конструкторы.** Навыки и рабочие процессы, которые создают каркасы новых пространств
+  имён, департаментов, проектов, агентов и баз знаний, плюс онбординг-интервью
+  (`docs/onboard-business.md`), которое накладывает ваш бизнес на архитектуру.
+- **Восемь профилей-эталонов.** `knowledge/_examples/` показывает восемь профилей
+  пространств имён (doctrine, data-system, design-system, content-strategy, tool-contract
+  и другие) как копируемые каркасы.
+- **Провенанс.** `PROVENANCE.yml` в корне репозитория фиксирует точный исходный коммит,
+  дату экспорта и версию конвейера, из которых получен этот релиз, в машиночитаемом виде.
 
-## Folder map
+## Карта папок
 
 ```
-_system/           The operative contract: schemas, rules, registries, validate.sh
-knowledge/         Namespace-first knowledge graph (the doctrine and your domains)
-entities/          Canonical executable entities: commands, agents, skills, rules
-.claude/ .codex/   Runtime adapter shims (regenerate with sync-adapters.sh)
-workflows/         Agentic reasoning pipelines
-automations/n8n/   Deterministic workflows (JSON plus a brain-record companion)
-tools/             Pointer nodes over bounded capabilities
-departments/       Assemblies over the entities: one folder per operating lane
-projects/          One PLAN.md per project, with inline tasks
-intake/            Inbound flow: source captures, routing, processed receipts
-data/              Pointers to where numbers live (never the numbers)
-memory/            Reviewed learnings
-outputs/           Produced artifacts with lineage
-sessions/          The audit trail of AI work sessions
-swarms/            Multi-agent sprint packages
-docs/              Setup, retrieval, and onboarding docs
+_system/           Действующий контракт: схемы, правила, реестры, validate.sh
+knowledge/         Граф знаний, первично по пространствам имён (доктрина и ваши домены)
+entities/          Канонические исполнимые сущности: команды, агенты, навыки, правила
+.claude/ .codex/ .qwen/   Прокладки адаптеров времени исполнения (пересоздаются через sync-adapters.sh)
+workflows/         Агентные конвейеры рассуждений
+automations/n8n/   Детерминированные рабочие процессы (JSON плюс сопроводительная запись мозга)
+tools/             Узлы-указатели над ограниченными возможностями
+departments/       Сборки поверх сущностей: одна папка на операционную линию
+projects/          Один PLAN.md на проект, с задачами внутри
+intake/            Входящий поток: захват источников, маршрутизация, квитанции об обработке
+data/              Указатели на то, где живут числа (никогда сами числа)
+memory/            Проверенные уроки
+outputs/           Созданные артефакты с происхождением
+sessions/          Журнал аудита ИИ-сессий работы
+swarms/            Пакеты многозадачных спринтов
+docs/              Документация по настройке, извлечению и онбордингу
 ```
 
-## The example tour (fifteen minutes)
+## Экскурсия по примеру (пятнадцать минут)
 
-1. `knowledge/emberline-studio/canon/brand-essentials.md`: a canon node, the studio's
-   source of truth. Note the verification fields and the changelog.
-2. `entities/rules/studio-brand-voice.md`: a rule derived from that canon.
-3. `entities/skills/write-product-description.md`: a skill that applies the rule.
-4. `entities/agents/studio-inbox-triage.md`: an agent that uses both and escalates what it
-   must not decide.
-5. `workflows/weekly-studio-review.md`: the weekly loop reading `data/orders-ledger.md`
-   (a pointer, never live numbers) and `memory/photograph-before-listing.md` (a lesson).
-6. `outputs/2026-06-05-spring-collection-brief.md`: what the loop produced, with lineage.
-7. `projects/_example/PLAN.md`: the work container that ties it together.
-8. `departments/example-studio-ops/INDEX.md`: the assembly of all of the above.
+1. `knowledge/emberline-studio/canon/brand-essentials.md`: узел канона, источник истины
+   студии. Обратите внимание на поля проверки и журнал изменений.
+2. `entities/rules/studio-brand-voice.md`: правило, выведенное из этого канона.
+3. `entities/skills/write-product-description.md`: навык, применяющий правило.
+4. `entities/agents/studio-inbox-triage.md`: агент, который использует оба и эскалирует то,
+   что не должен решать сам.
+5. `workflows/weekly-studio-review.md`: еженедельный цикл, читающий `data/orders-ledger.md`
+   (указатель, никогда не живые числа) и `memory/photograph-before-listing.md` (урок).
+6. `outputs/2026-06-05-spring-collection-brief.md`: что произвёл цикл, с происхождением.
+7. `projects/_example/PLAN.md`: контейнер работы, связывающий всё вместе.
+8. `departments/example-studio-ops/INDEX.md`: сборка всего перечисленного выше.
 
-Every file is under two minutes' reading. Follow the edges in the frontmatter; that is the
-graph.
+Каждый файл читается меньше чем за две минуты. Следуйте по рёбрам в frontmatter; это и есть
+граф.
 
-## The rules that keep it honest
+## Правила, которые держат систему честной
 
-- Every node-bearing file carries typed YAML frontmatter; `bash _system/validate.sh` must
-  exit 0.
-- Canon is operator-approved, always. Agents draft; you sign.
-- The repo never stores live numbers, live queues, or secrets: pointers only.
-- Sessions that touch the repo are registered, logged, and closed out in `sessions/`.
+- Каждый файл-узел несёт типизированный YAML-frontmatter; `bash _system/validate.sh`
+  должен завершаться с exit 0.
+- Канон утверждается оператором, всегда. Агенты черновики готовят; вы подписываете.
+- Репозиторий никогда не хранит живые числа, живые очереди или секреты: только указатели.
+- Сессии, которые касаются репозитория, регистрируются, логируются и закрываются в
+  `sessions/`.
 
-Shipped doctrine occasionally refers to Paperclip, the task runtime of the deployment this
-starter derives from: treat it as a placeholder for whatever runtime you adopt. Nothing
-here requires it.
+Поставляемая доктрина иногда ссылается на Paperclip, среду исполнения задач того деплоя,
+из которого произошёл этот стартер: относитесь к этому имени как к заглушке для любой среды,
+которую вы примете. Ничто здесь его не требует.
 
-## What's new: the 2026-07 release
+## Что нового: релиз 2026-07
 
-The starter still self-describes as architecture v3.1; this release extends the content,
-not the retrieval or ontology spec. Headlines:
+Стартер по-прежнему описывает себя как архитектуру v3.1; этот релиз расширяет контент,
+а не спецификацию извлечения или онтологии. Главное:
 
-- **The OODA orientation lens and the feedback-plane design.** Canon now frames the OS with
-  Orient as the dominant center (core-doctrine sections 14 and 15.2, department-model
-  section 11), backed by the shipped synthesis set: the Boyd bridge, the Act-to-Orient
-  feedback-plane spec, the wager-ledger decision and operative contract
-  (`_system/wager-ledger-rules.md`), and the interactive visual map in `docs/`. The wager
-  ledger is a ratified design, not a running system; it ships as doctrine you can build.
-- **The reflexive-brain-topology enterprise standard.** How a company organizes repos once
-  it runs the brain internally: shared parent, individual brains (one per person),
-  department brains, one company brain
-  (`knowledge/ai-architecture/pillars/reflexive-brain-topology.md`), plus the
-  trust-boundary graduation decision and playbook for when a department earns its own repo.
-- **`repo_kind` and `brain_tier` registry fields.** `_system/repo-registry-rules.md` and
-  the registry template now classify every repo as `brain`, `app`, or `mixed`, and every
-  brain as `individual`, `department`, or `company`.
-- **The asset-reference layer.** `_system/asset-reference-schema.md` and
-  `_system/asset-registry-rules.md`: binary assets stay out of git, references and
-  metadata stay in, the same discipline as secrets.
-- **Department operations.** The department-web canon (capture, convert, build, operate,
-  feed back), the ambient capture rule, the onboarding and operating guides, the
-  operations-readiness gate, and the daily-update workflow.
-- **Intake playbooks.** Processing procedures for the email and Slack source lanes
-  (`intake/playbooks/`), alongside the existing X, YouTube, web, repo, and research lanes.
-  Capture connectors are not bundled: you wire your own capture into `intake/sources/`,
-  and a connector suite is the planned next release.
-- **Machine-readable provenance.** `PROVENANCE.yml` replaces prose-only lineage: source
-  commit, source dirty-path count, export date, pipeline version, spec version.
-- **The companion harness repo.** The shared-parent tier of the topology is now a real,
-  runnable repo: [infinite-brain-harness](https://github.com/starmynd-org/infinite-brain-harness)
-  is a thin versioned root that holds this brain and its siblings, with the registry and
-  orientation layer for running multiple brains side by side.
+- **Линза ориентации OODA и дизайн плоскости обратной связи.** Канон теперь описывает ОС
+  с Orient как доминирующим центром (разделы 14 и 15.2 core-doctrine, раздел 11 модели
+  департаментов), подкреплённым поставляемым набором синтеза: мост Бойда, спецификация
+  плоскости обратной связи «Действие-Ориентация», решение и действующий контракт реестра
+  ставок (`_system/wager-ledger-rules.md`) и интерактивная визуальная карта в `docs/`.
+  Реестр ставок: ратифицированный дизайн, а не работающая система; он поставляется как
+  доктрина, которую можно построить.
+- **Корпоративный стандарт рефлексивной топологии мозга.** Как компания организует
+  репозитории, когда запускает мозг внутренне: общий родитель, индивидуальные мозги (по
+  одному на человека), мозги департаментов, один корпоративный мозг
+  (`knowledge/ai-architecture/pillars/reflexive-brain-topology.md`), плюс решение о
+  выпускном пороге доверия и плейбук для случая, когда департамент заслуживает собственный
+  репозиторий.
+- **Поля реестра `repo_kind` и `brain_tier`.** `_system/repo-registry-rules.md` и шаблон
+  реестра теперь классифицируют каждый репозиторий как `brain`, `app` или `mixed`, а
+  каждый мозг как `individual`, `department` или `company`.
+- **Слой ссылок на ассеты.** `_system/asset-reference-schema.md` и
+  `_system/asset-registry-rules.md`: бинарные ассеты остаются вне git, ссылки и метаданные
+  остаются внутри, та же дисциплина, что и для секретов.
+- **Операции департаментов.** Канон веб-департамента (capture, convert, build, operate,
+  feed back), правило фонового захвата, руководства по онбордингу и эксплуатации, гейт
+  готовности к операциям и рабочий процесс ежедневного обновления.
+- **Плейбуки входящего потока.** Процедуры обработки для почтовой и Slack-линий
+  (`intake/playbooks/`), наряду с существующими линиями X, YouTube, web, repo и research.
+  Коннекторы захвата не прилагаются: вы подключаете свой захват в `intake/sources/`, а
+  набор коннекторов: следующий запланированный релиз.
+- **Машиночитаемый провенанс.** `PROVENANCE.yml` заменяет происхождение только в виде
+  текста: исходный коммит, количество грязных путей источника, дата экспорта, версия
+  конвейера, версия спецификации.
+- **Сопутствующий репозиторий-обвязка.** Ярус общего родителя в топологии теперь реальный
+  запускаемый репозиторий: [infinite-brain-harness](https://github.com/starmynd-org/infinite-brain-harness)
+  это тонкий версионированный корень, который держит этот мозг и его соседей, со слоем
+  реестра и ориентации для запуска нескольких мозгов бок о бок.
 
-## Make it yours
+## Сделайте его своим
 
-Run the onboarding interview (`docs/onboard-business.md`), or go manual: build your first
-namespace with `entities/skills/build-namespace.md`, assemble your first department from
-`departments/_template/`, fill in `knowledge/personal-operator/pillars/operator-profile.md`,
-and retire the candle studio when you no longer need the training wheels.
+Пройдите онбординг-интервью (`docs/onboard-business.md`) или идите вручную: постройте
+первое пространство имён с помощью `entities/skills/build-namespace.md`, соберите первый
+департамент из `departments/_template/`, заполните
+`knowledge/personal-operator/pillars/operator-profile.md` и выведите студию свечей из
+эксплуатации, когда учебные колёса больше не нужны.
 
-Growing past one repo? Put your brains under the companion
-[infinite-brain-harness](https://github.com/starmynd-org/infinite-brain-harness) root: it
-carries the shared-parent orientation and repo registry from the reflexive-brain-topology
-standard, so a second brain is a registry entry, not a redesign.
+Вырастаете за пределы одного репозитория? Поместите свои мозги под корень сопутствующей
+обвязки [infinite-brain-harness](https://github.com/starmynd-org/infinite-brain-harness):
+он несёт ориентацию общего родителя и реестр репозиториев из стандарта рефлексивной
+топологии, так что второй мозг это запись в реестре, а не переделка.
 
-## License
+## Лицензия
 
-MIT. See `LICENSE`. Contributions welcome: see `CONTRIBUTING.md`.
+MIT. См. `LICENSE`. Вклад приветствуется: см. `CONTRIBUTING.md`.

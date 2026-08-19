@@ -24,19 +24,20 @@ created: "2026-05-31"
 
 # /build-department
 
-Build or upgrade a department in plain English.
+Строит или модернизирует департамент на простом английском языке.
 
-Example:
+Пример:
 
 ```text
 /build-department Build a shared devops-platform department that owns GitHub, CI/CD, secrets posture, deployment standards, and observability, then link domain departments to it rather than letting each own its own stack.
 ```
 
-This command should:
+Эта команда должна:
 
-1. read the operator's English request
-2. determine the department's function and type
-3. create or refine `departments/<slug>/INDEX.md`
-4. create missing head-agent or workflow entities when justified
-5. add or link the needed tools, namespaces, handoffs, and data-system posture
-6. leave a short build report in `outputs/`
+1. прочитать запрос оператора на английском
+2. определить функцию и тип департамента
+3. создать или уточнить `departments/<slug>/INDEX.md`
+4. создать недостающие сущности главного агента или рабочих процессов, когда это обосновано
+5. добавить или связать нужные инструменты, пространства имён, передачи и позицию
+   data-системы
+6. оставить краткий отчёт о постройке в `outputs/`

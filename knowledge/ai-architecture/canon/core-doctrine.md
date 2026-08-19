@@ -71,462 +71,481 @@ edges:
 created: "2026-05-30"
 ---
 
-## Read this first
+## Читайте это первым
 
-This is the canon of the `ai-architecture` namespace. It is the compressed
-first-principles synthesis a future agent should reason from before it expands into the
-graph below it. Read it whole. Then load the specific pillar, concept, or decision the
-question needs, using [[agent-load-order]] as the controller.
+Это канон пространства имён `ai-architecture`. Это сжатый синтез первопринципов, из
+которого будущий агент должен рассуждать, прежде чем расширяться в граф ниже. Прочитайте
+его целиком. Затем загрузите конкретный pillar, концепт или решение, которое нужно для
+вопроса, используя [[agent-load-order]] как контроллер.
 
-The Infinite Brain is a git-backed knowledge operating system for an AI-first operator.
-Its job is to make a corpus of knowledge, decisions, and procedures reliably retrievable
-and safely executable by AI agents, today and after the tools change. Its business aim is
-to make whole functions operable as AI-first shadow departments with a thin human layer on
-top. Everything below is a consequence of taking that job seriously. The architecture has
-one control model, one ontology, one physical topology, and a small set of layered
-disciplines that keep the graph trustworthy as it scales into many namespaces and then
-assembles those namespaces into departments.
+Infinite Brain это операционная система знаний на базе git для оператора с ИИ на первом
+месте. Её работа: делать корпус знаний, решений и процедур надёжно извлекаемым и безопасно
+исполняемым ИИ-агентами, сегодня и после смены инструментов. Её бизнес-цель: делать целые
+функции управляемыми как теневые департаменты с ИИ на первом месте и тонким человеческим
+слоем сверху. Всё ниже: следствие серьёзного отношения к этой работе. Архитектура имеет
+одну контрольную модель, одну онтологию, одну физическую топологию и небольшой набор
+слоёных дисциплин, которые держат граф заслуживающим доверия, когда он масштабируется во
+много пространств имён, а затем собирает эти пространства в департаменты.
 
-## 1. The control model: one planning ladder, a source-of-truth split, bounded adapters
+## 1. Контрольная модель: одна лестница планирования, разделение источника истины, ограниченные адаптеры
 
-The architecture is built around one durable rule, expanded in
-[[infinite-brain-control-model]]: planning, governance, and durable knowledge stay
-canonical in git, while execution, queue state, and tool-specific runtime state stay in
-the operational substrate that owns them. There are three system layers and they do not
-overlap:
+Архитектура построена вокруг одного долговечного правила, развёрнутого в
+[[infinite-brain-control-model]]: планирование, управление и долговечные знания остаются
+каноническими в git, тогда как исполнение, состояние очередей и специфичное для
+инструментов состояние времени исполнения остаются в операционной подложке, которая ими
+владеет. Есть три системных слоя, и они не пересекаются:
 
-1. **Git-backed canon** for project intent, doctrine, rules, workflows, and durable
-   summaries. This is the source of truth for what is known and decided.
-2. **Operational state** for live tasks, queues, in-flight approvals, runs, and swarm
-   fanout. This is mutable, fast, and not authoritative about meaning.
-3. **Analytical history** for throughput, telemetry, and trend analysis. This is
-   numbers, not doctrine.
+1. **Git-поддержанный канон** для намерения проекта, доктрины, правил, рабочих процессов и
+   долговечных сводок. Это источник истины о том, что известно и решено.
+2. **Операционное состояние** для живых задач, очередей, утверждений в полёте, запусков и
+   разветвления свармов. Оно изменяемо, быстро и не авторитетно о смысле.
+3. **Аналитическая история** для пропускной способности, телеметрии и анализа трендов.
+   Это числа, не доктрина.
 
-Because the layers are clean, many AI-facing adapters can exist without forking the
-truth: Obsidian as a reading surface, Claude Code and Codex as execution clients, n8n as
-deterministic workflow runtime, Paperclip as cockpit and operational projection, and
-swarm sprint folders as specialized execution packaging. Each adapter is a **surface**,
-and the surface boundary in [[surface-boundary]] is non-negotiable: a surface declares
-what it reads, what state it may own, what write paths it uses, whether promotion or
-approval is required, and which identity it acts under. A surface may own session state,
-preferences, queue and review state, and drafts with a clear writeback path. A surface
-may never become the only durable home of approved knowledge, hide canonical semantics
-in a private runtime schema, or mutate canon without a visible promotion event. Useful
-interfaces drift into second sources of truth unless this contract is explicit, so it is
-made explicit.
+Поскольку слои чисты, может существовать много адаптеров, обращённых к ИИ, без форка
+истины: Obsidian как поверхность чтения, Claude Code и Codex как клиенты исполнения, n8n
+как детерминированный рантайм рабочих процессов, Paperclip как кокпит и операционная
+проекция, и папки спринтов свармов как специализированная упаковка исполнения. Каждый
+адаптер это **поверхность**, и граница поверхности в [[surface-boundary]]
+неподсудна обсуждению: поверхность объявляет, что она читает, каким состоянием может
+владеть, какие пути записи использует, требуется ли продвижение или утверждение и под какой
+идентичностью действует. Поверхность может владеть состоянием сессии, предпочтениями,
+состоянием очередей и ревью и черновиками с ясным путём записи обратно. Поверхность никогда
+не может стать единственным долговечным домом утверждённого знания, прятать каноническую
+семантику в приватную схему времени исполнения или мутировать канон без видимого события
+продвижения. Полезные интерфейсы дрейфуют во вторые источники истины, если этот контракт
+неявен, поэтому он сделан явным.
 
-The planning ladder in [[planning-to-execution-ladder]] is the canonical anchor for all
-work: `initiative`, then `project`, then `task`. Specialized execution layers (workflow
-definition, run, swarm sprint, wave) hang off the parent task without changing the
-ontology. The parent task stays the planning anchor even when work routes to `manual`,
-`workflow`, `agent`, or `swarm`. This rejects three anti-patterns directly: making each
-swarm sprint a canonical project, creating a second backlog in the sprint folders, and
-letting a cockpit surface redefine the ladder. The deterministic-versus-agentic boundary
-in [[deterministic-workflow-boundary]] sits alongside this: deterministic work (n8n JSON,
-shell, validators) is paired with a brain record but runs where determinism is cheap;
-agentic reasoning runs where judgment is required. Routing across modes is visible and
-human-gated. The PM-agent in [[pm-agent-posture]] chooses the lowest-cost safe mode,
-recommends swarm readily for substantial multi-agent work, emits routing rationale and
-missing prerequisites, and stops short of launch authority. Swarm launch itself is
-governed by [[swarm-launch-governance]]: a structurally valid canonical task, an explicit
-swarm execution mode, a file-backed human-granted approval receipt, and bounded closeout
-writeback of only distilled planning truth. Routing may recommend; it may never bypass
-the gate.
+Лестница планирования в [[planning-to-execution-ladder]]: канонический якорь всей работы:
+`initiative`, затем `project`, затем `task`. Специализированные слои исполнения (определение
+рабочего процесса, запуск, спринт сварма, волна) висят на родительской задаче без изменения
+онтологии. Родительская задача остаётся якорем планирования, даже когда работа
+маршрутизируется в `manual`, `workflow`, `agent` или `swarm`. Это прямо отвергает три
+анти-паттерна: превращение каждого спринта сварма в канонический проект, создание второго
+бэклога в папках спринтов и позволение кокпит-поверхности переопределить лестницу. Граница
+детерминированного против агентного в [[deterministic-workflow-boundary]] сидит рядом с
+этим: детерминированная работа (n8n JSON, shell, валидаторы) парой с записью мозга, но
+выполняется там, где детерминизм дёшев; агентные рассуждения выполняются там, где требуется
+суждение. Маршрутизация между режимами видима и ограничена человеком. PM-агент в
+[[pm-agent-posture]] выбирает самый дешёвый безопасный режим, охотно рекомендует сварм для
+существенной мультиагентной работы, выдаёт обоснование маршрутизации и отсутствующие
+предпосылки и останавливается перед полномочием запуска. Сам запуск сварма управляется
+[[swarm-launch-governance]]: структурно валидная каноническая задача, явный режим исполнения
+сварма, файл-подкреплённая квитанция утверждения, данного человеком, и ограниченная запись
+обратно на закрытии только дистиллированной истины планирования. Маршрутизация может
+рекомендовать; она никогда не может обойти гейт.
 
-## 2. The business unit is the AI shadow department
+## 2. Бизнес-единица: теневой департамент с ИИ
 
-The architecture is not merely a clean way to store knowledge. Its real economic unit is the
-AI shadow department. This is the lesson behind the computer-in-the-corner problem in the
-older computer era and the AI-toolbar problem now: local productivity gains do not become
-company-level ROI unless the whole function is redesigned. One worker moving faster inside a
-broken chain does not fix the chain.
+Архитектура не просто чистый способ хранить знания. Её реальная экономическая единица:
+теневой департамент с ИИ. Это урок за проблемой компьютера в углу в более старой
+компьютерной эпохе и проблемой ИИ-тулбара сейчас: локальные выигрыши в продуктивности не
+становятся ROI на уровне компании, если не перепроектирована вся функция. Один работник,
+движущийся быстрее внутри сломанной цепи, не чинит цепь.
 
-The Infinite Brain therefore assumes the target operating state is an AI-first department with
-comprehensive intake, its own knowledge, its own execution surfaces, and a thin human layer on
-top. The thin human layer still owns goals, approvals, and hard exceptions, but the first pass
-belongs to AI. This is why intake is so load-bearing, why the system needs department start-here
-guides, and why each department should have a head-of-department agent and its own daily
-update. The department itself is not a new low-level entity type. It is an assembly over the
-ontology, expressed through the root `departments/` layer and the links it makes visible.
+Поэтому Infinite Brain предполагает, что целевое операционное состояние: департамент с ИИ
+на первом месте: всесторонний intake, собственные знания, собственные поверхности
+исполнения и тонкий человеческий слой сверху. Тонкий человеческий слой по-прежнему владеет
+целями, утверждениями и жёсткими исключениями, но первый проход принадлежит ИИ. Вот почему
+intake так несущ, почему системе нужны руководства «начни здесь» для департаментов и почему
+у каждого департамента должен быть агент-глава департамента и собственное ежедневное
+обновление. Сам департамент не новый низкоуровневый тип сущности. Это сборка поверх
+онтологии, выраженная через корневой слой `departments/` и ссылки, которые он делает
+видимыми.
 
-There is also a useful split inside the meta-system itself:
+Есть также полезное разделение внутри самой метасистемы:
 
-- `intake-operations` owns capture, normalization, durable receipts, and the first-pass
-  routing suggestion.
-- `infinite-brain-ops` owns the structural PKM decision: what should change in the brain,
-  what should become support or synthesis, what should become a canon candidate, and what
-  should instead become a task, tool entry, workflow, or new department implication.
+- `intake-operations` владеет захватом, нормализацией, долговечными квитанциями и первым
+  предположением маршрутизации.
+- `infinite-brain-ops` владеет структурным решением PKM: что должно измениться в мозге,
+  что должно стать support или synthesis, что должно стать кандидатом в канон, а что вместо
+  этого должно стать задачей, записью инструмента, рабочим процессом или импликацией нового
+  департамента.
 
-That split prevents the intake function from quietly becoming the canon function and makes
-the stewardship path auditable.
+Это разделение не даёт функции intake тихо стать функцией канона и делает путь опеки
+проверяемым.
 
-The same logic applies to software delivery. Cross-cutting GitHub, CI/CD, deployment,
-environment, secrets, and observability capabilities usually belong in a shared platform
-department rather than being redefined independently by every domain department.
+Та же логика применима к поставке ПО. Сквозные способности GitHub, CI/CD, развёртывания,
+окружения, секретов и наблюдаемости обычно принадлежат общему платформенному департаменту,
+а не переопределяются независимо каждым доменным департаментом.
 
-The same logic also applies to repo sprawl. Once the OS spans many repos, those repos need an
-explicit registry so departments can state which repos they own, consume, or plan to digest.
-Without that registry, cross-repo planning silently collapses back into human memory.
+Та же логика применима и к расползанию репозиториев. Как только ОС охватывает много
+репозиториев, им нужен явный реестр, чтобы департаменты могли заявлять, какими
+репозиториями они владеют, какие потребляют и какие планируют переварить. Без этого реестра
+межрепозиторное планирование молча схлопывается обратно в человеческую память.
 
-Every real department should also carry a charter. The assembly surface answers what the
-department contains; the charter answers what it is trying to optimize and how success is
-measured. Without both, the department is incomplete.
+Каждый реальный департамент должен также нести хартию. Поверхность сборки отвечает на
+вопрос, что содержит департамент; хартия отвечает на вопрос, что он пытается
+оптимизировать и как измеряется успех. Без обоих департамент неполон.
 
-## 3. Namespace-first topology and the shared base
+## 3. Топология «сначала пространство имён» и общая база
 
-The knowledge graph is organized physically by namespace first, not by node type first.
-This is settled in [[knowledge-graph-namespace-first-topology]] and reaffirmed in V2 by
-[[infinite-brain-namespace-architecture-v2]]. The unit is `knowledge/<namespace>/`, and
-each namespace holds its own typed subfolders and, where migration matters, its own full
-archive colocated with it. The global registry lives in `_system/namespaces/`. The
-reasons hold: it matches how operators browse, it makes partial sharing and repo-splitting
-straightforward, it keeps full PKM possible because doctrine and raw archive live
-together, and it makes migration audits tractable because each namespace has one physical
-home. Type-first layout is rejected as the long-term topology; it does not scale to many
-namespaces and full-source migrations. Cross-namespace links remain expected. Storage by
-namespace is for browsability and portability, not isolation.
+Граф знаний физически организован сначала по пространствам имён, а не сначала по типам
+узлов. Это закреплено в [[knowledge-graph-namespace-first-topology]] и подтверждено в V2
+документом [[infinite-brain-namespace-architecture-v2]]. Единица: `knowledge/<namespace>/`,
+и каждое пространство имён держит свои собственные типизированные подпапки и, где важна
+миграция, собственный полный архив, расположенный рядом. Глобальный реестр живёт в
+`_system/namespaces/`. Причины держатся: это соответствует тому, как операторы просматривают,
+делает частичный шеринг и разделение репозиториев простыми, сохраняет полный PKM возможным,
+потому что доктрина и сырой архив живут вместе, и делает аудиты миграции выполнимыми,
+потому что у каждого пространства имён один физический дом. Макет «сначала тип» отвергнут
+как долгосрочная топология; он не масштабируется на много пространств имён и полные миграции
+источников. Межпространственные ссылки остаются ожидаемыми. Хранение по пространствам имён:
+для обозримости и портируемости, не для изоляции.
 
-Every serious namespace shares one **base surface set**, defined in
-[[profile-aware-knowledge-graph-design]] and the operative profile registry: `INDEX.md`,
-`canon/`, `playbooks/`, `support/`, and `synthesis/`. A profile adds folders to this base.
-A profile never removes a base surface and never invents a competing ontology. The shared
-base is what lets one set of review rules, one validator, and one load-order discipline
-work across every namespace. Starter and example namespaces may carry a reduced base and
-must say so in their `INDEX.md`.
+Каждое серьёзное пространство имён делит один **набор базовых поверхностей**, определённый
+в [[profile-aware-knowledge-graph-design]] и действующем реестре профилей: `INDEX.md`,
+`canon/`, `playbooks/`, `support/` и `synthesis/`. Профиль добавляет папки к этой базе.
+Профиль никогда не удаляет базовую поверхность и никогда не изобретает конкурирующую
+онтологию. Общая база это то, что позволяет одному набору правил ревью, одному валидатору
+и одной дисциплине порядка загрузки работать во всех пространствах имён. Стартерные и
+примерные пространства имён могут нести урезанную базу и обязаны сказать об этом в своём
+`INDEX.md`.
 
-Namespace-first topology does not mean repo-blind topology. The OS may span several repos, so a
-separate repo-registry layer is justified for cross-repo ownership, purpose, and digestion
-tracking.
+Топология «сначала пространство имён» не означает топологию, слепую к репозиториям. ОС
+может охватывать несколько репозиториев, поэтому отдельный слой реестра репозиториев
+оправдан для межрепозиторного владения, назначения и отслеживания переваривания.
 
-## 4. The canon layer: compressed reasoning over a graph
+## 4. Слой канона: сжатые рассуждения над графом
 
-Each serious namespace carries a `canon/` layer, explained in [[canon-layer]] and
-[[what-canon-means]]. Canon is the compressed, operator-approved, provenance-bearing
-first-principles synthesis a future agent thinks from before expanding into the graph.
-It is closer to the synthesized Boyd HTML docs than to a one-line loader. Canon
-synthesizes and compresses across pillars, concepts, and decisions; it does not paraphrase
-them node by node. It is small relative to the graph it sits over. It is the first thing
-an agent loads. It carries `derived_from` edges to what it compresses, `verified_at` and
-`verified_by` frontmatter, and a `## Changelog`.
+Каждое серьёзное пространство имён несёт слой `canon/`, объяснённый в [[canon-layer]] и
+[[what-canon-means]]. Канон это сжатый, утверждённый оператором синтез первопринципов с
+провенансом, из которого будущий агент думает, прежде чем расширяться в граф. Он ближе к
+синтезированным HTML-документам Бойда, чем к однострочному загрузчику. Канон синтезирует и
+сжимает поперёк pillars, концептов и решений; он не перефразирует их узел за узлом. Он мал
+относительно графа, над которым лежит. Он первое, что загружает агент. Он несёт рёбра
+`derived_from` к тому, что сжимает, frontmatter `verified_at` и `verified_by` и
+`## Changelog`.
 
-What canon is not: not a copy of `pillars/`, not a parking lot for open questions
-(unresolved material lives in `synthesis/`), not runtime state, not raw archive, not a
-public export. The promotion path is strict: raw source flows to `support/` (provenance
-recorded), then to `synthesis/` (derived reading), then to a canon-candidate, then to
-canon on operator approval. The canon discipline is what keeps the top layer trustworthy
-as the graph grows: without it, canon either inflates into a second copy of the corpus or
-decays into a stale loader. The required canon files for a full-canon namespace are
-`README.md` (navigational), `core-doctrine.md` (this node), and `agent-load-order.md`
-(navigational). Stateful namespaces add `current-truth.md`; this one does not, because it
-holds durable doctrine.
+Чем канон не является: не копией `pillars/`, не парковкой для открытых вопросов
+(неразрешённый материал живёт в `synthesis/`), не состоянием времени исполнения, не сырым
+архивом, не публичным экспортом. Путь продвижения строгий: сырой источник течёт в `support/`
+(провенанс записан), затем в `synthesis/` (производное прочтение), затем в
+кандидата-в-канон, затем в канон по утверждению оператора. Дисциплина канона: то, что
+держит верхний слой заслуживающим доверия по мере роста графа: без неё канон либо
+раздувается во вторую копию корпуса, либо вырождается в устаревший загрузчик. Требуемые
+файлы канона для пространства с полным каноном: `README.md` (навигационный),
+`core-doctrine.md` (этот узел) и `agent-load-order.md` (навигационный). Состоятельные
+пространства имён добавляют `current-truth.md`; это не добавляет, потому что держит
+долговечную доктрину.
 
-## 5. Retrieval over raw memory: name the consumer
+## 5. Извлечение поверх сырой памяти: назовите потребителя
 
-Memory is raw material; retrieval is the operating layer. The right small fragments beat
-a large undifferentiated context. This is the core thesis in
-[[retrieval-over-raw-memory]], and it is why the whole architecture exists: a pile of
-notes is not a brain, a retrievable graph is. The decisive move is to **name the consumer**
-and design surfaces for that real reader. Today the consumer is Claude Code and Codex
-file-reading agents that retrieve by grep and read against the working tree. There is no
-external index in the baseline; the local clone plus any sibling canon repos is the entire
-retrieval surface. Surfaces are therefore designed for a grep-and-read agent: rich
-`INDEX.md` routers, canon entry points, resolvable wikilinks, kebab-case type-prefixed
-ids, and tight nodes that fit a context window. MCP or RAG is a possible future adapter,
-not a present dependency. If a retriever is ever planned, the retrieval load-order policy
-names it; until then it is not assumed. This is the difference between architecture that
-serves a real reader and architecture that serves an imagined one.
+Память: сырой материал; извлечение: операционный слой. Правильные малые фрагменты бьют
+большой недифференцированный контекст. Это основная теза в [[retrieval-over-raw-memory]], и
+это причина, по которой существует вся архитектура: куча заметок не мозг, извлекаемый граф
+это мозг. Решающий ход: **назвать потребителя** и спроектировать поверхности под этого
+реального читателя. Сегодня потребитель это файловые агенты Claude Code и Codex, которые
+извлекают через grep и read по рабочему дереву. В базовой линии нет внешнего индекса;
+локальный клон плюс любые соседние канон-репозитории: вся поверхность извлечения. Поверхности
+поэтому спроектированы под агента grep-and-read: богатые маршрутизаторы `INDEX.md`, точки
+входа канона, резолвящиеся wikilink-и, kebab-case id с типовыми префиксами и плотные узлы,
+вмещающиеся в контекстное окно. MCP или RAG: возможный будущий адаптер, не текущая
+зависимость. Если извлекатель когда-либо запланирован, политика порядка загрузки извлечения
+называет его; до тех пор он не предполагается. Это разница между архитектурой, которая
+служит реальному читателю, и архитектурой, которая служит воображаемому.
 
-## 6. Profile-aware graph design: eight profiles, one ontology
+## 6. Дизайн графа с учётом профиля: восемь профилей, одна онтология
 
-Different knowledge domains need different folder shapes, but they must not fork the
-ontology. The resolution, in [[profile-aware-knowledge-graph-design]] and
-[[namespace-profiles]], is one ontology and eight profiles over the shared base. Each
-profile adds folders and a lint emphasis; none replaces the base. The eight, locked in
-[[namespace-profile-set-v1]]:
+Разным доменам знаний нужны разные формы папок, но они не должны форкать онтологию.
+Разрешение, в [[profile-aware-knowledge-graph-design]] и [[namespace-profiles]],: одна
+онтология и восемь профилей поверх общей базы. Каждый профиль добавляет папки и акцент
+линта; ни один не заменяет базу. Восемь, закреплённые в [[namespace-profile-set-v1]]:
 
-- **Doctrine** (Stable): durable concepts, principles, decisions. Adds `pillars/`,
-  `concepts/`, `decisions/`, optional `archive/`. This namespace is Doctrine.
-- **Tool Contract** (Provisional): how to call a tool or API correctly. Canon file of
-  record is `core-contract.md`.
-- **Data System** (Provisional, highest near-term value): source-to-dashboard data flow.
-  Uses the metric primitive.
-- **Design System** (Provisional): approved visual and stylistic canon.
-- **Component Library** (Provisional): approved reusable implementation patterns; source
-  code stays in its implementation repo.
-- **Content Strategy** (Provisional): themes, positions, angles, and their links to
-  marketing, product, doctrine, and evidence.
-- **Operating Library** (Provisional): how to execute recurring work and diagnose
-  problems. May use the metric primitive for diagnosis.
-- **Intake Fabric** (Stable as a root layer, not a knowledge namespace): inbound capture
-  and routing, lives at root `intake/`.
+- **Doctrine** (стабильный): долговечные концепты, принципы, решения. Добавляет `pillars/`,
+  `concepts/`, `decisions/`, опционально `archive/`. Это пространство имён: Doctrine.
+- **Tool Contract** (провизорный): как корректно вызывать инструмент или API. Канонический
+  файл записи: `core-contract.md`.
+- **Data System** (провизорный, наивысшая ближайшая ценность): поток данных от источника к
+  дашборду. Использует примитив метрик.
+- **Design System** (провизорный): утверждённый визуальный и стилевой канон.
+- **Component Library** (провизорный): утверждённые переиспользуемые шаблоны реализации;
+  исходный код остаётся в его репозитории реализации.
+- **Content Strategy** (провизорный): темы, позиции, ракурсы и их ссылки на маркетинг,
+  продукт, доктрину и доказательства.
+- **Operating Library** (провизорный): как исполнять повторяющуюся работу и диагностировать
+  проблемы. Может использовать примитив метрик для диагностики.
+- **Intake Fabric** (стабильный как корневой слой, не пространство знаний): входящий захват
+  и маршрутизация, живёт в корневом `intake/`.
 
-Stable means a real namespace validates the schema; Provisional means the schema is
-defined from analysis and must be validated against the first real namespace of that type.
-Provisional profiles ship as reference scaffolds in `knowledge/_examples/`, which doubles
-as the second and third reference implementations. Profiles with shared DNA (Design System
-and Component Library; Tool Contract, Data System, and Operating Library) are kept distinct
-for now and revisited only if two real namespaces prove they collapse. The required base
-and profile surfaces are enforced by [[required-namespace-surfaces]].
+«Стабильный» значит, что реальное пространство имён валидирует схему; «провизорный» значит,
+что схема определена из анализа и должна быть валидирована против первого реального
+пространства имён этого типа. Провизорные профили поставляются как справочные каркасы в
+`knowledge/_examples/`, что заодно служит второй и третьей эталонными реализациями. Профили
+с общей ДНК (Design System и Component Library; Tool Contract, Data System и Operating
+Library) пока держатся раздельно и пересматриваются, только если два реальных пространства
+имён докажут, что схлопываются. Требуемые поверхности базы и профиля принуждаются
+документом [[required-namespace-surfaces]].
 
-## 7. Synthesis as first-class
+## 7. Синтез как первоклассный слой
 
-Derived thinking that is neither raw archive nor settled canon node gets its own home.
-Synthesis is first-class, with two levels: `knowledge/<namespace>/synthesis/` for
-within-namespace derived work (contradiction maps, best-current-reading notes,
-what-changed reviews, canon-candidate packages) and `synthesis/` at repo root for
-cross-namespace work that no single namespace should own. The synthesis-versus-support
-boundary is sharp and load-bearing: `support/` holds provenance, migration receipts, and
-source-priority tables (mechanical and historical); `synthesis/` holds interpretive,
-current, derived intellectual work. Do not put synthesis in `support/`; do not put
-migration receipts in `synthesis/`. Open disputes live in `synthesis/`, never in canon.
-This namespace points its live questions to `synthesis/profile-comparison`,
-`synthesis/current-namespace-gap-map`, and `synthesis/x-research-lessons`.
+Производное мышление, которое не является ни сырым архивом, ни устоявшимся канон-узлом,
+получает собственный дом. Синтез первоклассен, с двумя уровнями:
+`knowledge/<namespace>/synthesis/` для внутрипространственной производной работы (карты
+противоречий, заметки лучшего-текущего-прочтения, обзоры что-изменилось, пакеты
+кандидатов-в-канон) и `synthesis/` в корне репозитория для межпространственной работы,
+которой не должен владеть ни один отдельный неймспейс. Граница синтез-против-support остра
+и несуща: `support/` держит провенанс, квитанции миграции и таблицы приоритетов источников
+(механические и исторические); `synthesis/` держит интерпретативную, текущую, производную
+интеллектуальную работу. Не кладите синтез в `support/`; не кладите квитанции миграции в
+`synthesis/`. Открытые споры живут в `synthesis/`, никогда в каноне. Это пространство имён
+указывает свои живые вопросы на `synthesis/profile-comparison`,
+`synthesis/current-namespace-gap-map` и `synthesis/x-research-lessons`.
 
-## 8. Intake as a root OS layer: the three-layer split
+## 8. Intake как корневой слой ОС: трёхслойное разделение
 
-Intake is a root OS layer at `intake/`, not an ordinary knowledge namespace. It is the
-convergence point for inbound items from X, bookmarks, YouTube, web, repos, email, Slack,
-ideas, and AI-guided deep research, explained in [[intake-fabric-namespace]]. Its
-discipline is the **three-layer split**:
+Intake: корневой слой ОС в `intake/`, не обычное пространство знаний. Это точка схождения
+для входящих пунктов из X, закладок, YouTube, веба, репозиториев, почты, Slack, идей и
+углублённых исследований с ИИ, объяснённое в [[intake-fabric-namespace]]. Его дисциплина:
+**трёхслойное разделение**:
 
-1. **Connector and runtime layer**: OAuth, polling, token refresh, live queue state.
-   Stays in the operational app, for example a small FastAPI connector app. Live
-   queue state is never tracked in git.
-2. **Durable intake layer** (in git, at `intake/`): captured source records, processed
-   receipts, routing decisions, routing doctrine, playbooks.
-3. **Knowledge layer** (in `knowledge/`): only distilled doctrine, decisions, playbooks,
-   and receipts produced from intake. The destination namespace owns the durable canon;
-   intake never owns truth.
+1. **Слой коннекторов и времени исполнения**: OAuth, опрос, обновление токенов, живое
+   состояние очередей. Остаётся в операционном приложении, например, небольшом приложении
+   коннекторов на FastAPI. Живое состояние очередей никогда не отслеживается в git.
+2. **Долговечный слой intake** (в git, в `intake/`): захваченные записи источников,
+   квитанции об обработке, решения маршрутизации, доктрина маршрутизации, плейбуки.
+3. **Слой знаний** (в `knowledge/`): только дистиллированная доктрина, решения, плейбуки и
+   квитанции, произведённые из intake. Пространство имён назначения владеет долговечным
+   каноном; intake никогда не владеет истиной.
 
-Intake captures source context, tracks processing and routing, and moves high-signal
-items into durable homes. The three record schemas (intake record, routing decision,
-processed receipt) are the operative contract. The split is what keeps live operational
-churn out of the durable graph while still preserving the receipt trail that makes intake
-auditable.
+Intake захватывает контекст источника, отслеживает обработку и маршрутизацию и перемещает
+пункты с высоким сигналом в долговечные дома. Три схемы записей (запись intake, решение
+маршрутизации, квитанция об обработке): действующий контракт. Разделение: то, что держит
+живую операционную суету вне долговечного графа, сохраняя при этом след квитанций, который
+делает intake проверяемым.
 
-Where an intake item implies a structural change to the brain, a fourth trace artifact is
-added: the PKM opportunity. That creates an explicit auditable chain:
+Где пункт intake подразумевает структурное изменение мозга, добавляется четвёртый
+артефакт следа: PKM-возможность. Это создаёт явную проверяемую цепь:
 
 ```text
 source record -> processed receipt -> PKM opportunity -> disposition -> files changed or task created
 ```
 
-This is how the system traces not only routing, but structural learning.
+Так система прослеживает не только маршрутизацию, но и структурное обучение.
 
-## 8.25. Sessions are a root audit layer
+## 8.25. Сессии: корневой слой аудита
 
-AI work sessions also need a durable trail, but transcripts are neither canon nor live
-queue state. The root `sessions/` layer holds session registration records, raw transcript
-copies, and closeout reviews for conversations that touched the repo. The session layer is
-parallel to intake in one important way: it is an upstream audit surface that feeds durable
-structure, not the durable structure itself. A session may produce memory candidates, PKM
-candidates, tasks, swarm proposals, support notes, or synthesis, but the transcript does
-not bypass the promotion path. Session start is forced: register the chat, declare the log
-path, record the initial context. Session end is forced: close out the session, extract
-follow-ups and learnings, and move them into their proper homes. The retrieval rule is the
-same as elsewhere in the architecture: the session record and closeout review load first,
-the raw log opens only on demand for audit or handoff recovery.
+Рабочие сессии ИИ тоже нуждаются в долговечном следе, но транскрипты не являются ни каноном,
+ни живым состоянием очередей. Корневой слой `sessions/` держит записи регистрации сессий,
+сырые копии транскриптов и обзоры закрытия для разговоров, которые касались репозитория.
+Слой сессий параллелен intake в одном важном смысле: это поверхность аудита выше по течению,
+которая питает долговечную структуру, а не сама долговечная структура. Сессия может
+производить кандидатов в память, кандидатов в PKM, задачи, предложения свармов, заметки
+support или синтез, но транскрипт не обходит путь продвижения. Старт сессии принуждается:
+зарегистрируйте чат, объявите путь к логу, запишите начальный контекст. Конец сессии
+принуждается: закройте сессию, извлеките доработки и уроки и переместите их в их
+правильные дома. Правило извлечения то же, что и везде в архитектуре: запись сессии и обзор
+закрытия загружаются первыми, сырой лог открывается только по требованию для аудита или
+восстановления передачи.
 
-## 8.5. Tools are a first-class operating registry
+## 8.5. Инструменты: первоклассный операционный реестр
 
-Execution dependencies should be explicit. The root `tools/` layer is the operating registry
-for tools the OS depends on: APIs, UI apps, data sources, automation runtimes, MCP servers,
-and export adapters. This registry is not a replacement for deeper tool documentation. It is
-the discoverability, ownership, and routing layer over those dependencies.
+Зависимости исполнения должны быть явными. Корневой слой `tools/`: операционный реестр
+инструментов, от которых зависит ОС: API, UI-приложения, источники данных, рантаймы
+автоматизации, MCP-серверы и экспортные адаптеры. Этот реестр не заменяет более глубокую
+документацию инструментов. Это слой обнаружимости, владения и маршрутизации поверх этих
+зависимостей.
 
-When a tool needs serious API or ETL documentation, that deeper treatment belongs in a
-tool-contract or data-system namespace under `knowledge/`. The root registry exists so
-departments, agents, and workflows do not have to guess what systems exist or who depends on
-them.
+Когда инструменту нужна серьёзная документация API или ETL, эта более глубокая обработка
+принадлежит пространству имён tool-contract или data-system под `knowledge/`. Корневой
+реестр существует, чтобы департаменты, агенты и рабочие процессы не гадали, какие системы
+существуют или кто от них зависит.
 
-## 8.6. Secrets are a first-class reference registry
+## 8.6. Секреты: первоклассный реестр ссылок
 
-Credential posture should be explicit without turning git into a secret store. The root
-`secrets/` layer is the operating registry for provider-neutral secret references: stable
-`secret_ref.id` values, ownership, runtime scope, backend pointers, and rotation posture. It
-stores references and policy metadata only. Raw values stay in the external secret backend and
-bind at runtime.
+Позиция по учётным данным должна быть явной без превращения git в хранилище секретов.
+Корневой слой `secrets/`: операционный реестр нейтральных к провайдеру ссылок на секреты:
+стабильные значения `secret_ref.id`, владение, область времени исполнения, указатели на
+бэкенды и позиция ротации. Он хранит только ссылки и метаданные политики. Сырые значения
+остаются во внешнем секретном бэкенде и связываются во времени исполнения.
 
-This registry exists so tools, surfaces, deterministic workflows, and future namespace consumers
-such as brand or design-system work do not invent parallel secret maps or inline provider-specific
-details in many places. The shared `devops-platform` department owns this posture by default, and
-domain departments usually consume it rather than re-defining it.
+Этот реестр существует, чтобы инструменты, поверхности, детерминированные рабочие процессы
+и будущие потребители пространств имён, такие как работа бренда или дизайн-системы, не
+изобретали параллельные карты секретов или встроенные детали, специфичные для провайдера,
+во многих местах. Общий департамент `devops-platform` владеет этой позицией по умолчанию, а
+доменные департаменты обычно потребляют её, а не переопределяют.
 
-## 9. Correction to structure
+## 9. Исправление в структуру
 
-Repeated correction becomes structure, not repeated chat. When an operator corrects an
-agent the same way twice, the correction is absorbed into a rule, playbook, decision, or
-canon revision so the agent stops needing the correction. This is the loop in
-[[correction-loop-absorption]], and it is how the brain learns rather than just
-accumulating. The correction loop closes against the right layer: a recurring routing
-mistake becomes a decision or playbook; a recurring factual error becomes a canon
-revision with a changelog entry; a recurring intake misroute becomes a routing rule. The
-test is simple: if you would otherwise type the same correction a third time, it belongs
-in structure.
+Повторное исправление становится структурой, а не повторным чатом. Когда оператор исправляет
+агента одинаково дважды, исправление впитывается в правило, плейбук, решение или ревизию
+канона, чтобы агент перестал нуждаться в исправлении. Это цикл в
+[[correction-loop-absorption]], и так мозг учится, а не просто накапливает. Цикл исправлений
+замыкается на правильный слой: повторяющаяся ошибка маршрутизации становится решением или
+плейбуком; повторяющаяся фактическая ошибка становится ревизией канона с записью в журнале
+изменений; повторяющийся неверный ввод в intake становится правилом маршрутизации. Тест
+прост: если вы в противном случае набрали бы то же исправление в третий раз, ему место в
+структуре.
 
-## 10. Harness and memory portability
+## 10. Портируемость обвязки и памяти
 
-If you do not own the harness, you do not fully own memory. Git-backed canon is durable;
-adapters are replaceable. Anti-lock-in is a design goal, not an afterthought. The truth
-lives in plain Markdown and YAML in git, readable by any agent that can read files, so
-the brain survives a change of model, client, or vendor. Claude Code and Codex are
-current adapters, not owners. This is why canon is files and not a proprietary store, why
-ids and links are plain text, and why the retrieval baseline is grep-and-read rather than
-a hosted index. Portability is preserved by keeping the durable layer tool-agnostic and
-pushing tool-specific state to the surfaces that own it under [[surface-boundary]].
+Если вы не владеете обвязкой, вы не полностью владеете памятью. Git-поддержанный канон
+долговечен; адаптеры заменяемы. Анти-блокировка: цель дизайна, а не мысль задним числом.
+Истина живёт в простых Markdown и YAML в git, читаемых любым агентом, который может читать
+файлы, поэтому мозг переживает смену модели, клиента или вендора. Claude Code и Codex:
+текущие адаптеры, не владельцы. Вот почему канон это файлы, а не проприетарное хранилище,
+почему id и ссылки: простой текст и почему базовая линия извлечения: grep-and-read, а не
+хостинговый индекс. Портируемость сохраняется удержанием долговечного слоя
+инструментально-нейтральным и выталкиванием специфичного для инструментов состояния на
+поверхности, которые им владеют, под [[surface-boundary]].
 
-## 11. Output linkage
+## 11. Связь с результатами
 
-Every namespace answers what outputs its canon drives. Output is first-class: a
-namespace whose canon improves nothing is suspect. Output linkage appears in each
-`INDEX.md` under "What this namespace drives" and in reviews. For `ai-architecture` the
-driven outputs are the namespace builders and curators, the validator rules, the swarm
-governance contract, the intake scaffold, and the V2 upgrade plans for every other
-namespace. Naming the outputs keeps doctrine honest: it forces each piece of canon to
-point at a real decision, project, or artifact it should make better.
+Каждое пространство имён отвечает на вопрос, какие результаты водит его канон. Результат
+первоклассен: пространство имён, чей канон ничего не улучшает, подозрительно. Связь с
+результатами появляется в каждом `INDEX.md` под заголовком «What this namespace drives» и в
+ревью. Для `ai-architecture` водимые результаты: конструкторы и кураторы пространств имён,
+правила валидатора, контракт управления свармами, каркас intake и планы обновления V2 для
+каждого другого пространства имён. Называние результатов держит доктрину честной: оно
+заставляет каждый кусок канона указывать на реальное решение, проект или артефакт, который
+он должен улучшить.
 
-## 12. The metric primitive
+## 12. Примитив метрик
 
-A metric is one shared typed node, not three private definitions. It is keyed by
-`metric_id` and has three faces, defined in [[metric-primitive]]: definition (what it
-means), lineage (source, transform, model, refresh, owned by the Data System namespace),
-and diagnosis (what moves it, failure modes, next actions, owned by the Operating Library
-namespace). Both faces reference the same `metric_id`. The metric primitive is the bridge
-that keeps a Data System namespace and an Operating Library namespace talking about the
-same number instead of two divergent ones. It carries `format`, `polarity`, `aggregation`,
-`expression`, and `depends_on` so the number is unambiguous across namespaces.
+Метрика: один общий типизированный узел, а не три приватных определения. Она ключуется по
+`metric_id` и имеет три грани, определённые в [[metric-primitive]]: определение (что она
+означает), происхождение (источник, трансформация, модель, обновление, принадлежащее
+пространству имён Data System) и диагностика (что её двигает, режимы отказа, следующие
+действия, принадлежащие пространству имён Operating Library). Обе грани ссылаются на один и
+тот же `metric_id`. Примитив метрик: мост, который держит пространство имён Data System и
+пространство имён Operating Library говорящими об одном и том же числе вместо двух
+расходящихся. Он несёт `format`, `polarity`, `aggregation`, `expression` и `depends_on`,
+чтобы число было однозначным поперёк пространств имён.
 
-## 13. Public export is a surface, not architecture
+## 13. Публичный экспорт: поверхность, не архитектура
 
-Public LLM surfaces such as `llms.txt` are export and discovery surfaces, not internal
-architecture, per [[internal-index-vs-public-llm-index]] and
-[[public-llm-index-export-posture]]. The internal `INDEX.md` is the rich retrieval router
-for trusted agents. `llms.txt` is a thin public summary generated from `canon/`, never
-from raw notes, and only for namespaces meant for external discovery. The generator reads
-canon and produces the public surface; it never bypasses canon or publishes internal-only
-material. Keeping export downstream of canon means the public face cannot drift from the
-private truth, and the private truth is never shaped by what is safe to publish.
+Публичные LLM-поверхности, такие как `llms.txt`,: экспортные и обнаружимые поверхности,
+не внутренняя архитектура, по [[internal-index-vs-public-llm-index]] и
+[[public-llm-index-export-posture]]. Внутренний `INDEX.md`: богатый маршрутизатор извлечения
+для доверенных агентов. `llms.txt`: тонкая публичная сводка, генерируемая из `canon/`,
+никогда из сырых заметок, и только для пространств имён, предназначенных для внешнего
+обнаружения. Генератор читает канон и производит публичную поверхность; он никогда не обходит
+канон и не публикует материал только для внутреннего использования. Удержание экспорта ниже
+по течению от канона означает, что публичное лицо не может дрейфовать от приватной истины, а
+приватная истина никогда не формируется тем, что безопасно публиковать.
 
-## 14. Operating gaps and planned additions are tracked in synthesis
+## 14. Операционные пробелы и запланированные дополнения отслеживаются в синтезе
 
-Canon describes the system as it runs. Requirements for operating capability the system
-does not currently run, including the four additions the 2026-06-03 management-system analysis
-contributed (a standing operating scorecard and review cadence, flow control over agent
-work, fleet-level autonomy governance, and accountability plus cost pacing), are tracked
-in two synthesis nodes: `autonomy-readiness-requirements` states each requirement with
-its current status, and `autonomy-architecture-gap-register` is the audited,
-severity-ranked gap register beneath them. When a requirement is built, verified, and
-operator-approved, the operating discipline it produces enters canon through the normal
-promotion path.
+Канон описывает систему как она работает. Требования к операционной способности, которую
+система сейчас не запускает, включая четыре дополнения, которые внесло
+управление-системное исследование от 2026-06-03 (постоянная операционная карта показателей
+и каданс ревью, контроль потока над работой агентов, управление автономией флота и
+подотчётность плюс темп затрат), отслеживаются в двух узлах синтеза:
+`autonomy-readiness-requirements` излагает каждое требование с его текущим статусом, а
+`autonomy-architecture-gap-register`: проверяемый реестр пробелов, ранжированный по
+серьёзности, под ними. Когда требование построено, верифицировано и утверждено оператором,
+операционная дисциплина, которую оно производит, входит в канон через обычный путь
+продвижения.
 
-Read as Boyd's OODA web, the analytical plane is the Act-to-Orient feedback arrow that turns the
-loop from a pipeline into a web; its absence is tracked in [[feedback-plane-act-to-orient-loop]]. The
-decided implementation of that arrow is the wager ledger, an operator-ratified decision
-([[wager-ledger-and-scientific-loop]], operative contract `_system/wager-ledger-rules.md`): every
-consequential action carries a pre-registered, business-grounded, falsifiable prediction scored later
-against an exogenous metric, with department-owned attribution and calibration. It is decided, not yet
-built, so it lives as a decision and a project ([[department-operating-guide]] is the operating
-guide), consistent with this section.
+Читая как OODA-сеть Бойда, аналитическая плоскость это стрелка обратной связи
+«Действие-Ориентация», которая превращает петлю из конвейера в сеть; её отсутствие
+отслеживается в [[feedback-plane-act-to-orient-loop]]. Решённая реализация этой стрелки:
+реестр ставок, ратифицированное оператором решение ([[wager-ledger-and-scientific-loop]],
+действующий контракт `_system/wager-ledger-rules.md`): каждое существенное действие несёт
+предварительно зарегистрированный, обоснованный бизнесом, фальсифицируемый прогноз,
+оцениваемый позже против экзогенной метрики, с атрибуцией и калибровкой, принадлежащими
+департаменту. Решено, ещё не построено, поэтому оно живёт как решение и проект
+([[department-operating-guide]]: операционное руководство), согласно этому разделу.
 
-## 15. What the recent analysis does not add
+## 15. Что недавний анализ не добавляет
 
-Most of the recent management-system corpus should not be imported into `ai-architecture`
-canon because it is either already built here or not needed at the doctrine layer.
+Большую часть недавнего управление-системного корпуса не следует импортировать в канон
+`ai-architecture`, потому что оно либо уже построено здесь, либо не нужно на слое доктрины.
 
-### 15.1. Already built here
+### 15.1. Уже построено здесь
 
-These were corroborated, not newly discovered:
+Эти вещи были подтверждены, а не заново открыты:
 
-- the three-plane source-of-truth split and surface boundary
-- correction to structure instead of repeated correction by chat
-- single-owner tasks and bounded launch authority
-- retrieval designed for a real file-reading consumer
-- namespace-first topology and canon-first reasoning
-- the AI shadow department thesis rather than local AI-toolbar gains
+- трёхплоскостное разделение источника истины и граница поверхности
+- исправление в структуру вместо повторного исправления чатом
+- задачи с единственным владельцем и ограниченные полномочия запуска
+- извлечение, спроектированное под реального файлового потребителя
+- топология «сначала пространство имён» и рассуждения «сначала канон»
+- теза теневого департамента с ИИ вместо локальных выигрышей ИИ-тулбара
 
-These are stronger after the external analysis, but they were already core doctrine.
+Эти вещи стали сильнее после внешнего анализа, но они уже были ядром доктрины.
 
-### 15.2. Not needed as canon imports
+### 15.2. Не нужно как импорт в канон
 
-These do not justify architecture-level adoption:
+Эти вещи не оправдывают принятие на уровне архитектуры:
 
-- the full EOS or Traction package, including its complete ritual and vocabulary layer
-- the full Scaling Up framework beyond the constraint, scorecard, and pacing insights
-- the full Metronomics horizon stack as architecture doctrine; its unique value mostly
-  collapses into focus and pacing, tracked as requirements in
+- полный пакет EOS или Traction, включая его полный слой ритуалов и словаря
+- полный каркас Scaling Up сверх инсайтов ограничения, карты показателей и темпа
+- полный стек горизонтов Metronomics как архитектурная доктрина; его уникальная ценность
+  в основном схлопывается в фокус и темп, отслеживаемые как требования в
   `autonomy-readiness-requirements`
-- generic agile ceremony as the governing model of the brain; agile remains a delivery
-  method, not the architecture's control model
-- Boyd as the main organizing architecture frame is still rejected; Boyd remains a complement on
-  orientation and adaptation, not the control model of record. The one complement worth holding
-  explicitly: read as OODA, the architecture's strength is that Orient is externalized (the
-  knowledge graph, canon, retrieval, fat skills) and its weakest arrow is Act-to-Orient feedback.
-  The mapping and that gap are owned by `knowledge/ai-architecture/synthesis/boyd-to-agent-architecture-ooda-map.md` and
-  [[feedback-plane-act-to-orient-loop]], not by canon
+- генерическая agile-церемония как управляющая модель мозга; agile остаётся методом
+  доставки, а не контрольной моделью архитектуры
+- Бойд как главная организующая рамка архитектуры по-прежнему отвергнут; Бойд остаётся
+  дополнением по ориентации и адаптации, не контрольной моделью записи. Одно дополнение,
+  которое стоит держать явно: читая как OODA, сильная сторона архитектуры в том, что Orient
+  экстернализован (граф знаний, канон, извлечение, толстые навыки), а её самая слабая
+  стрелка: обратная связь «Действие-Ориентация». Маппинг и этот пробел принадлежат
+  `knowledge/ai-architecture/synthesis/boyd-to-agent-architecture-ooda-map.md` и
+  [[feedback-plane-act-to-orient-loop]], а не канону
 
-The rule is simple: import the missing governor, not the source framework's whole
-language.
+Правило простое: импортируйте недостающий регулятор, а не весь язык исходного каркаса.
 
-## Next reads after the spine
+## Следующие чтения после стержня
 
-This node is the compressed spine. Three canon reads sit directly under it and should be
-loaded next depending on the question:
+Этот узел: сжатый стержень. Три канон-чтения лежат прямо под ним и должны быть загружены
+следующими в зависимости от вопроса:
 
-- [[system-overview]]: the single read-this-first map of the whole OS. It names every
-  entity type, shows how they compose, and states the four orienting disciplines (the
-  INDEX-and-canon-first load order, the `_system`-versus-doctrine split, the surface
-  boundary, the planning ladder). Read it when the question is "what is the system and how
-  do I navigate it."
-- [[department-model]]: the compressed doctrine for AI shadow departments. Read it when the
-  question is "how does this OS become a real AI-first department rather than a set of
-  disconnected helpers."
-- The entity-type canon in `canon/entities/`: one file per type ([[skills]], [[agents]],
+- [[system-overview]]: единственная карта «читай сначала» всей ОС. Она называет каждый тип
+  сущности, показывает, как они компонуются, и излагает четыре ориентирующие дисциплины
+  (порядок загрузки «сначала INDEX и канон», разделение `_system` против доктрины, граница
+  поверхности, лестница планирования). Читайте его, когда вопрос «что такое система и как
+  по ней перемещаться».
+- [[department-model]]: сжатая доктрина теневых департаментов с ИИ. Читайте его, когда
+  вопрос «как эта ОС становится реальным департаментом с ИИ на первом месте, а не набором
+  разрозненных помощников».
+- Канон типов сущностей в `canon/entities/`: один файл на тип ([[skills]], [[agents]],
   [[commands]], [[rules]], [[workflows]], [[deterministic-workflows]], [[workflow-loops]],
   [[knowledge-namespaces]], [[knowledge-nodes]], [[data-nodes]], [[memory-nodes]],
-  [[output-nodes]], [[projects]], [[tools]], [[metrics]]). Each states what the type is
-  for, when to use it, its required shape, how it relates to the others, and the rules that
-  govern it. Read the relevant file when the question is "how do I build or choose type X."
-- [[problem-to-architecture]]: the operator procedure for converting an unstructured
-  problem or business workflow into an implementable, AI-architecture-shaped system. Read
-  it when the question is "how do I turn this messy goal into the OS."
+  [[output-nodes]], [[projects]], [[tools]], [[metrics]]). Каждый излагает, для чего тип,
+  когда его использовать, его требуемую форму, как он относится к другим и правила, которые
+  им управляют. Читайте релевантный файл, когда вопрос «как построить или выбрать тип X».
+- [[problem-to-architecture]]: операторская процедура преобразования неструктурированной
+  проблемы или бизнес-процесса в реализуемую систему формы ИИ-архитектуры. Читайте его,
+  когда вопрос «как превратить эту нечёткую цель в ОС».
 
-## How these pieces compose
+## Как эти части компонуются
 
-The architecture is one system, not twelve. The control model decides where truth lives.
-Namespace-first topology decides where knowledge sits. The canon layer decides what an
-agent reads first. Retrieval-over-raw-memory decides who that agent is and what it can do.
-Profiles decide how a domain shapes its folders without forking the ontology. Synthesis
-and intake decide where derived thinking and inbound flow live. Correction-to-structure
-decides how the brain learns. Portability decides what survives a tool change. Output
-linkage decides what the brain is for. The metric primitive decides how numbers stay
-coherent across namespaces. The department model decides how the ontology assembles into
-business functions with AI-first intake and thin human oversight. Public export decides what
-faces outward. An agent that holds
-these together can reason about any specific architecture question and know which deeper
-node to open next.
+Архитектура: одна система, не двенадцать. Контрольная модель решает, где живёт истина.
+Топология «сначала пространство имён» решает, где сидят знания. Слой канона решает, что агент
+читает первым. Извлечение поверх сырой памяти решает, кто этот агент и что он может.
+Профили решают, как домен формирует свои папки без форка онтологии. Синтез и intake решают,
+где живут производное мышление и входящий поток. Исправление-в-структуру решает, как мозг
+учится. Портируемость решает, что переживает смену инструментов. Связь с результатами
+решает, для чего мозг. Примитив метрик решает, как числа остаются согласованными поперёк
+пространств имён. Модель департаментов решает, как онтология собирается в бизнес-функции с
+intake на первом месте и тонким человеческим надзором. Публичный экспорт решает, что
+обращено наружу. Агент, который держит всё это вместе, может рассуждать о любом конкретном
+архитектурном вопросе и знать, какой более глубокий узел открыть следующим.
 
-## Changelog
+## Журнал изменений
 
-- 2026-05-30: initial V2 canon synthesis (sprint ai-architecture-namespace-v2-upgrade).
-- 2026-05-31: added the "Next reads after the spine" section pointing at the new
-  system-overview, the per-type entity canon in canon/entities/, and the
-  problem-to-architecture canon (canon-depth expansion, sprint
+- 2026-05-30: начальный синтез канона V2 (спринт ai-architecture-namespace-v2-upgrade).
+- 2026-05-31: добавлена секция «Следующие чтения после стержня», указывающая на новый
+  system-overview, покатный канон сущностей в canon/entities/ и канон
+  problem-to-architecture (расширение глубины канона, спринт
   v2-rollout-and-ops-hardening).
-- 2026-06-03: narrowed the recent management-systems analysis to four canon additions:
-  operating scorecard plus cadence, flow control, fleet autonomy governance, and
-  accountability plus cost pacing. Marked the rest as already built or not needed.
-- 2026-06-10: moved the four future-capability additions (old section 14) out of canon into
-  synthesis/autonomy-readiness-requirements with a pointer left in section 14, because canon
-  describes the system as it runs. Operator-approved (the-operator) in the 2026-06-10
-  working session that commissioned the harness-hardening program.
-- 2026-06-10: added canon/doctrine-card.md, a compressed operating projection of this node
-  that the root CLAUDE.md and AGENTS.md startup now reads first, with
-  _system/retrieval-routing-map.md for namespace selection and mandatory drill-down to this
-  node and _system/README.md for architecture-, contract-, and canon-touching work; the card
-  is re-verified when this node changes and this node wins on conflict. Operator-approved
-  (the-operator) in the 2026-06-10 working session that commissioned the harness-hardening
-  program.
-- 2026-06-19: added the OODA orientation lens to section 15.2, and to section 14 the Act-to-Orient
-  feedback-arrow framing plus the wager-ledger decision pointer (the decided, not-yet-built design for
-  that arrow). Operator-approved (the-operator) in the 2026-06-19 canonization session. The wager
-  ledger stays a decision and a project, not running canon, consistent with section 14.
+- 2026-06-03: сужено недавнее управление-системное исследование до четырёх канон-дополнений:
+  операционная карта показателей плюс каданс, контроль потока, управление автономией флота
+  и подотчётность плюс темп затрат. Остальное помечено как уже построенное или ненужное.
+- 2026-06-10: четыре дополнения будущей способности (старый раздел 14) перемещены из канона
+  в synthesis/autonomy-readiness-requirements с указателем, оставленным в разделе 14, потому
+  что канон описывает систему как она работает. Утверждено оператором (the-operator) в
+  рабочей сессии 2026-06-10, которая заказала программу закалки обвязки.
+- 2026-06-10: добавлен canon/doctrine-card.md, сжатая операционная проекция этого узла,
+  которую стартовые корневые CLAUDE.md и AGENTS.md теперь читают первыми, с
+  _system/retrieval-routing-map.md для выбора пространств имён и обязательным углублением в
+  этот узел и _system/README.md для работы, касающейся архитектуры, контракта и канона;
+  карточка повторно верифицируется при изменении этого узла, и этот узел побеждает при
+  конфликте. Утверждено оператором (the-operator) в рабочей сессии 2026-06-10, которая
+  заказала программу закалки обвязки.
+- 2026-06-19: добавлена линза ориентации OODA в раздел 15.2, а в раздел 14: рамка стрелки
+  обратной связи «Действие-Ориентация» плюс указатель решения реестра ставок (решённый,
+  ещё не построенный дизайн для этой стрелки). Утверждено оператором (the-operator) в сессии
+  канонизации 2026-06-19. Реестр ставок остаётся решением и проектом, не действующим каноном,
+  согласно разделу 14.

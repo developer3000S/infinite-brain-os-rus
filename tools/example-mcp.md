@@ -21,7 +21,7 @@ created: "2026-05-20"
 
 > **v3.1 note:** This file describes gbrain as an example of an OPTIONAL retrieval
 > adapter. v3.1 does not require any retrieval adapter; agents read git directly via
-> Claude Code's Read, Grep, and Glob primitives. Install gbrain only if a deployment
+> Qwen Code's Read, Grep, and Glob primitives. Install gbrain only if a deployment
 > outgrows direct read at very high node counts (typically several thousand nodes).
 > See `docs/retrieval.md` for the retrieval contract; PROVENANCE.yml at the repo root
 > records the source lineage of this export.
@@ -32,7 +32,7 @@ via the Model Context Protocol. It is an edge component, never a system of recor
 ## What it does
 
 When installed, gbrain indexes the Markdown node files in this repo and the connected
-canon repos. It exposes a search interface via MCP so Claude Code can retrieve relevant
+canon repos. It exposes a search interface via MCP so Qwen Code can retrieve relevant
 nodes by natural-language query without loading every file.
 
 gbrain is read-only. It never writes to git or modifies any node. It is an index,
@@ -47,7 +47,7 @@ activate it. See that file for the exact server startup command and environment 
 
 ## Available tools
 
-Once connected, Claude Code has access to:
+Once connected, Qwen Code has access to:
 
 | MCP tool | Description |
 |----------|-------------|
@@ -65,7 +65,7 @@ Search for all Knowledge nodes about customer segmentation.
 
 If gbrain is installed as an optional adapter, agents may call `mcp__gbrain__search`;
 otherwise, agents use Read, Grep, and Glob directly against the local clone. You do not
-need to invoke either path manually; refer to the work in natural language and Claude
+need to invoke either path manually; refer to the work in natural language and Qwen
 Code routes the call to whichever retrieval surface is available.
 
 ## Index scope

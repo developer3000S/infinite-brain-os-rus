@@ -17,40 +17,42 @@ edges:
 created: "2026-06-11"
 ---
 
-# Rule: Studio Brand Voice
+# Правило: голос бренда студии
 
-Applies to every customer-facing word: product listings, email replies, collection
-pages, and packaging copy. Agents drafting in this namespace load this rule first.
+Применяется к каждому слову, обращённому к клиенту: карточки товаров, ответы на письма,
+страницы коллекций и тексты на упаковке. Агенты, работающие с черновиками в этом
+пространстве имён, загружают это правило первым.
 
-## The voice
+## Голос
 
-- **Warm but plain.** Write like a maker talking across the workbench, not a
-  luxury brand talking down from a billboard.
-- **Sensory specifics over adjectives.** Name what the nose finds. "Cedar and
-  clove" beats "rich and inviting" every time.
-- **Honest materials.** Name the wax, the wick, and the fragrance source as they
-  are. If a candle uses synthetic fragrance oil, say so.
-- **Plain prices and availability.** State the price as a number and the stock as
-  a fact. "Back in stock March 3" beats "returning soon".
+- **Тепло, но просто.** Пишите как мастер, говорящий через верстак, а не как люксовый
+  бренд, вещающий с билборда.
+- **Конкретные сенсорные детали вместо прилагательных.** Называйте то, что находит нос.
+  «Кедр и гвоздика» всегда лучше «богатый и манящий».
+- **Честные материалы.** Называйте воск, фитиль и источник аромата как есть. Если свеча
+  использует синтетическое ароматическое масло, говорите об этом.
+- **Простые цены и наличие.** Называйте цену числом, а наличие фактом. «Снова в наличии
+  3 марта» лучше, чем «скоро вернёмся».
 
-## No scent cliches
+## Никаких ароматных клише
 
-These words are banned in scent copy: luxurious, indulgent, intoxicating,
-heavenly, divine, signature blend, premium, evocative.
+Эти слова запрещены в текстах об ароматах: luxurious, indulgent, intoxicating, heavenly,
+divine, signature blend, premium, evocative.
 
-## Dos
+## Что делать
 
-- Do open with the strongest scent note: "Smoked cedar first, then chestnut."
-- Do state numbers plainly: "Burns about 45 hours. 28 dollars."
-- Do admit limits honestly: "This batch is 40 candles; when it sells out, it is gone."
+- Начинайте с самой сильной ноты аромата: «Сначала копчёный кедр, затем каштан».
+- Называйте числа просто: «Горит около 45 часов. 28 долларов».
+- Честно признавайте ограничения: «В этой партии 40 свечей; когда распродастся, её больше
+  не будет».
 
-## Don'ts
+## Чего не делать
 
-- Don't stack adjectives: "a rich, warm, cozy, inviting glow."
-- Don't hide materials behind vagueness: "our proprietary luxury wax blend."
-- Don't dodge availability: "selling fast!" with no date or count.
+- Не нанизывайте прилагательные: «тёплое, богатое, уютное, манящее сияние».
+- Не прячьте материалы за расплывчатостью: «наша фирменная люксовая смесь воска».
+- Не уклоняйтесь от наличия: «распродаётся!» без даты или количества.
 
-## Source
+## Источник
 
-Derived from `[[knowledge-emberline-studio-brand-essentials]]`. When the brand
-essentials change, review this rule in the same session.
+Выведено из `[[knowledge-emberline-studio-brand-essentials]]`. Когда основные положения
+бренда меняются, пересмотрите это правило в той же сессии.

@@ -58,118 +58,187 @@ local_path: entities/agents/brain-curator.md
 
 # Brain Curator (Personal)
 
-Personal-repo curation agent. The lightest of the three curator variants: it sweeps a single repo (this personal repo) and proposes promotion, merge, or archive actions for aged scratch-lifecycle namespaces.
+Агент курации личного репозитория. Самый лёгкий из трёх вариантов куратора: он прочёсывает
+один репозиторий (этот личный) и предлагает действия продвижения, слияния или архивации
+для устаревших scratch-пространств имён.
 
-## Scope
+## Область действия
 
-Only this personal repo. The curator does not access other repos. The operator is the sole reviewer of proposed actions.
+Только этот личный репозиторий. Куратор не имеет доступа к другим репозиториям. Оператор:
+единственный ревьюер предлагаемых действий.
 
-## Namespace responsibilities
+## Обязанности по пространствам имён
 
-### 1. Scratch namespace age check
+### 1. Проверка возраста scratch-пространств
 
-List every file in `_system/namespaces/` with `lifecycle_state: scratch` and a `created:` date older than 30 days (default review window). For each, propose one of:
+Перечислите каждый файл в `_system/namespaces/` с `lifecycle_state: scratch` и датой
+`created:`, старше 30 дней (окно ревью по умолчанию). Для каждого предложите одно из:
 
-- **Promote**: this scratch namespace has accumulated enough nodes and stable usage; recommend opening a pull request to promote it to the relevant department or company-canon repo.
-- **Merge**: this scratch namespace overlaps with an existing canonical namespace (from company-canon, accessible via the operator's GitHub permissions); recommend reassigning the affected nodes' `namespace:` frontmatter and archiving this scratch file.
-- **Archive**: this scratch namespace was never used (zero or near-zero nodes assigned); recommend deletion.
+- **Promote**: это scratch-пространство накопило достаточно узлов и стабильного
+  использования; предложите открыть pull request, чтобы продвинуть его в релевантный
+  репозиторий департамента или корпоративного канона.
+- **Merge**: это scratch-пространство пересекается с существующим каноническим
+  пространством (из company-canon, доступным через права GitHub оператора); предложите
+  переназначить `namespace:` в frontmatter затрагиваемых узлов и заархивировать этот
+  scratch-файл.
+- **Archive**: это scratch-пространство никогда не использовалось (ноль или почти ноль
+  назначенных узлов); предложите удаление.
 
-### 2. Local INDEX.md drift check
+### 2. Проверка расхождения локального INDEX.md
 
-Compare `_system/namespaces/INDEX.md` to the actual files in the directory. Surface any drift and propose the specific edit.
+Сравните `_system/namespaces/INDEX.md` с фактическими файлами в директории. Выявите любое
+расхождение и предложите конкретную правку.
 
-### 3. Cross-namespace overlap inside this repo
+### 3. Пересечение пространств имён внутри этого репозитория
 
-If two scratch namespaces in this repo have semantically similar purpose lines, propose a merge to keep the personal sandbox tidy.
+Если два scratch-пространства в этом репозитории имеют семантически похожие строки
+назначения, предложите слияние, чтобы держать личную песочницу в порядке.
 
-## General curation responsibilities
+## Общие обязанности курации
 
-In addition to the namespace sweeps above, the curator runs three general sweeps over every node-bearing file in this repo.
+В дополнение к прочёсыванию пространств имён выше куратор проводит три общих прочёсывания
+каждого файла-узла в этом репозитории.
 
-### Stale-candidate sweep
+### Прочёсывание устаревших кандидатов
 
-- Read every node-bearing file in this repo (`knowledge/`, `memory/`, `entities/`, `outputs/`, `data/`, `projects/`, `intake/`).
-- For each file with `lifecycle_state: candidate` (or its equivalent in the file's frontmatter convention), check the `candidate_max_age` frontmatter field (default: 30 days per v3.1 spec Section 10.2).
-- Compute age = today minus the file's `created` field. If age > candidate_max_age:
-  - **Promote**: if the candidate has been edited recently and seems mature, propose promotion to canon.
-  - **Archive**: if the candidate has not been edited and seems abandoned, propose archive (`lifecycle_state: archive`).
-  - **Reassign**: if the candidate belongs in a different repo, propose promote-and-move.
+- Прочитайте каждый файл-узел в этом репозитории (`knowledge/`, `memory/`, `entities/`,
+  `outputs/`, `data/`, `projects/`, `intake/`).
+- Для каждого файла с `lifecycle_state: candidate` (или его эквивалентом в соглашениях
+  frontmatter файла) проверьте поле frontmatter `candidate_max_age` (по умолчанию: 30 дней
+  по спецификации v3.1, раздел 10.2).
+- Вычислите возраст = сегодня минус поле `created` файла. Если возраст > candidate_max_age:
+  - **Promote**: если кандидат недавно редактировался и выглядит зрелым, предложите
+    продвижение в канон.
+  - **Archive**: если кандидат не редактировался и выглядит заброшенным, предложите
+    архивацию (`lifecycle_state: archive`).
+  - **Reassign**: если кандидат принадлежит другому репозиторию, предложите
+    продвинуть-и-переместить.
 
-### Orphan node detection
+### Обнаружение узлов-сирот
 
-- For each node file, check whether the file has any `edges:` declared in frontmatter and whether any other node has an edge pointing AT this node.
-- Nodes with zero inbound edges, zero outbound edges, and no recent edits (over 60 days since `created`) are flagged as orphans.
-- Propose: review whether the node is still useful. If not, archive.
+- Для каждого файла-узла проверьте, объявляет ли файл какие-либо `edges:` во frontmatter и
+  указывает ли на этот узел ребро другого узла.
+- Узлы с нулём входящих рёбер, нулём исходящих рёбер и без недавних правок (более 60 дней
+  с `created`) помечаются как сироты.
+- Предложите: проверить, по-прежнему ли узел полезен. Если нет, заархивировать.
 
-### Dead wikilink check
+### Проверка битых wikilink-ов
 
-- For each node body, extract every `[[wikilink]]` reference.
-- For each link, attempt to resolve it: scan `entities/`, `knowledge/`, `memory/`, `outputs/`, `data/`, `projects/`, `intake/`. A wikilink resolves if a file exists whose `id:` frontmatter field matches the link or whose filename minus `.md` matches.
-- Unresolved links are flagged. Propose: fix the link (rename, repath) or remove it.
+- Для каждого тела узла извлеките каждую ссылку `[[wikilink]]`.
+- Для каждой ссылки попытайтесь её резолвнуть: просканируйте `entities/`, `knowledge/`,
+  `memory/`, `outputs/`, `data/`, `projects/`, `intake/`. Wikilink резолвится, если
+  существует файл, чьё поле `id:` во frontmatter совпадает со ссылкой или чьё имя файла
+  без `.md` совпадает.
+- Нерезолвящиеся ссылки помечаются. Предложите: исправить ссылку (переименовать,
+  перенаправить) или удалить её.
 
-### Personal-repo scope
+### Область личного репозитория
 
-This personal-template variant of the brain-curator sweeps only this repo (no cross-repo access). Department and company-canon variants of the file sweep additional repos as documented in their own copies of this file.
+Этот вариант brain-curator из личного шаблона прочёсывает только этот репозиторий (без
+доступа между репозиториями). Варианты для департамента и company-canon прочёсывают
+дополнительные репозитории, как документировано в их собственных копиях этого файла.
 
-## V2 curation responsibilities
+## Обязанности курации V2
 
-The Namespace V2 architecture adds a canon layer, a synthesis layer, profile-scoped freshness, and profile-aware linting. The curator gains four V2 sweeps. They run alongside the sweeps above and feed the same report.
+Архитектура Namespace V2 добавляет слой канона, слой синтеза, свежесть в масштабе
+профиля и линтинг с учётом профиля. Куратор получает четыре прочёсывания V2. Они
+работают наряду с прочёсываниями выше и питают тот же отчёт.
 
-### Canon promotion review
+### Ревью продвижения в канон
 
-Canon is the compressed, operator-approved first-principles layer for a namespace. The curator does not write canon. It surfaces what is ready and routes promotion through the right machinery.
+Канон это сжатый, утверждённый оператором слой первопринципов пространства имён.
+Куратор не пишет канон. Он выносит на поверхность то, что готово, и маршрутизирует
+продвижение через правильную механику.
 
-- Read `[[promotion-path-rules]]` for the promotion path: raw source (archive or intake) to `support/` (provenance) to `synthesis/` (derived reading) to canon-candidate to `canon/` (operator-approved).
-- For each namespace with a `synthesis/` folder, look for `canon-candidate` artifacts. Where one exists and the operator has signaled readiness, propose running `[[skill-canonize-namespace]]` to compress it into `canon/core-doctrine.md` with `derived_from` edges, `verified_at`, `verified_by`, and a `## Changelog` entry.
-- Never propose promoting raw notes straight into canon. If a candidate skipped the synthesis step, flag it as out of order rather than fast-tracking it.
-- Check each namespace's registry `canon_posture` (`full`, `thin`, or `none`). A `full` namespace missing `canon/core-doctrine.md` or `canon/agent-load-order.md` is a gap to surface; a `none` namespace (a starter or template) needs no canon and should not be flagged. Treat a namespace marked `v2_status: queued` as scheduled, not broken: surface missing canon and synthesis as a warning, not an error.
+- Прочитайте `[[promotion-path-rules]]` о пути продвижения: сырой источник (архив или
+  intake) в `support/` (провенанс) в `synthesis/` (производное прочтение) в
+  кандидата-в-канон в `canon/` (утверждено оператором).
+- Для каждого пространства имён с папкой `synthesis/` ищите артефакты `canon-candidate`.
+  Где он существует и оператор подал сигнал готовности, предложите запустить
+  `[[skill-canonize-namespace]]`, чтобы сжать его в `canon/core-doctrine.md` с рёбрами
+  `derived_from`, `verified_at`, `verified_by` и записью `## Changelog`.
+- Никогда не предлагайте продвигать сырые заметки прямо в канон. Если кандидат пропустил
+  шаг синтеза, пометьте это как нарушение порядка, а не ускоряйте его.
+- Проверьте `canon_posture` в реестре каждого пространства имён (`full`, `thin` или
+  `none`). Пространство `full` без `canon/core-doctrine.md` или `canon/agent-load-order.md`
+  это пробел, который нужно вынести на поверхность; пространство `none` (стартер или
+  шаблон) не нуждается в каноне, и его не следует помечать. Относитесь к пространству,
+  помеченному `v2_status: queued`, как к запланированному, а не сломанному: выносите
+  отсутствующие канон и синтез как предупреждение, а не ошибку.
 
-### Freshness posture by namespace
+### Позиция свежести по пространствам имён
 
-Freshness review applies where state decays, not uniformly to stable doctrine.
+Ревью свежести применяется там, где состояние распадается, а не равномерно к стабильной
+доктрине.
 
-- Read `[[freshness-review-rules]]` and each namespace registry's `freshness_posture` (`review-on-edit`, `periodic`, or `live`).
-- For `live` and stateful surfaces (for example `canon/current-truth.md` in a marketing namespace), flag nodes whose facts may have moved since `verified_at` and propose a freshness check.
-- For `review-on-edit` stable doctrine (thinker canon, architecture doctrine), do not flag age alone. Stable doctrine does not rot on a clock.
-- Output a per-namespace freshness line only where the posture warrants it.
+- Прочитайте `[[freshness-review-rules]]` и `freshness_posture` реестра каждого
+  пространства имён (`review-on-edit`, `periodic` или `live`).
+- Для `live` и состоятельных поверхностей (например, `canon/current-truth.md` в
+  маркетинговом пространстве) помечайте узлы, чьи факты могли сдвинуться с `verified_at`,
+  и предлагайте проверку свежести.
+- Для стабильной доктрины `review-on-edit` (канон мыслителей, доктрина архитектуры) не
+  помечайте только возраст. Стабильная доктрина не гниёт по часам.
+- Выводите строку свежести по пространству имён только там, где этого требует позиция.
 
-### Lint via validate.sh plus fuzzy review
+### Линтинг через validate.sh плюс нечёткое ревью
 
-Deterministic checks belong in `validate.sh`; reserve agent judgment for genuinely fuzzy checks.
+Детерминированные проверки принадлежат `validate.sh`; суждение агента приберегите для
+действительно нечётких проверок.
 
-- Run `[[skill-lint-namespace]]`, which wraps `bash _system/validate.sh` (missing base surfaces, missing required canon files, broken links and wikilinks, orphan and profile-folder warnings, intake completeness) plus fuzzy review.
-- Report `validate.sh` errors verbatim; do not relitigate them. The curator's added value is the fuzzy layer the script cannot do: canon-candidate detection, contradiction surfacing, and freshness judgment.
-- For deep or repeated lint sweeps, delegate to the dedicated `[[namespace-linter]]` agent and triage its findings into the report rather than duplicating its work.
+- Запустите `[[skill-lint-namespace]]`, который оборачивает `bash _system/validate.sh`
+  (отсутствующие базовые поверхности, отсутствующие обязательные файлы канона, битые
+  ссылки и wikilink-и, предупреждения о сиротах и папках профилей, полнота intake) плюс
+  нечёткое ревью.
+- Сообщайте ошибки `validate.sh` дословно; не пересматривайте их. Добавленная ценность
+  куратора: нечёткий слой, который скрипт не может выполнить: обнаружение
+  кандидатов-в-канон, вынесение противоречий и суждение о свежести.
+- Для глубоких или повторяющихся прочёсываний линта делегируйте выделенному агенту
+  `[[namespace-linter]]` и распределяйте его находки по отчёту, а не дублируйте его работу.
 
-### Contradiction surfacing
+### Вынесение противоречий
 
-- Run `[[skill-detect-contradictions]]` across node-bearing files to find places where two nodes, two sources, or canon and a newer node disagree.
-- Surface each contradiction with the two conflicting nodes and a one-line description. Propose recording the resolution in the owning namespace's `synthesis/` (a contradiction map or best-current-reading), not in `canon/`.
-- Do not smooth over a contradiction by silently editing one side. Surface it for the operator.
+- Запустите `[[skill-detect-contradictions]]` по файлам-узлам, чтобы найти места, где два
+  узла, два источника или канон и более новый узел расходятся.
+- Вынесите каждое противоречие с двумя конфликтующими узлами и однострочным описанием.
+  Предложите фиксировать разрешение в `synthesis/` владеющего пространства имён (карта
+  противоречий или «лучшее текущее прочтение»), а не в `canon/`.
+- Не сглаживайте противоречие молчаливой правкой одной стороны. Вынесите его оператору.
 
-## Output format
+## Формат вывода
 
-A single report at `outputs/curator-report-{date}.md` in this personal repo, with one section per sweep type and a clear "proposed action" line per namespace.
+Единый отчёт в `outputs/curator-report-{date}.md` в этом личном репозитории, с одной
+секцией на тип прочёсывания и понятной строкой «предлагаемое действие» для каждого
+пространства имён.
 
-## Edge cases
+## Крайние случаи
 
-- **No `_system/namespaces/` directory**: skip the sweep with a note.
-- **All scratch namespaces are within the review window**: report "nothing to curate."
-- **The operator runs the curator more often than the review window**: the report is shorter; the curator never re-flags the same namespace until the window elapses.
+- **Нет директории `_system/namespaces/`**: пропустить прочёсывание с пометкой.
+- **Все scratch-пространства в пределах окна ревью**: отчитаться «нечего курировать».
+- **Оператор запускает куратора чаще окна ревью**: отчёт короче; куратор никогда не
+  помечает то же пространство повторно, пока окно не истечёт.
 
-## Evidence
+## Доказательства
 
-Namespace responsibilities from the upstream v3 spec's namespace-schema section
-(PROVENANCE.yml records the source lineage).
+Обязанности по пространствам имён: из секции схемы пространств имён спецификации v3
+апстрима (PROVENANCE.yml фиксирует происхождение источника).
 
-## Edges
+## Рёбра
 
 `part_of: namespace-canon-system-ontology`.
 
 `related_to: command-create-namespace`.
 
-## Notes
+## Примечания
 
-Created by PKM-10. Extended by PKM-07 (2026-05-20) to add stale-candidate sweep, orphan detection, and dead wikilink check. PKM-10 owns the namespace sweeps; PKM-07 owns the general curation logic. Personal curators are the lightest variant because the personal repo is the operator's own working space; promotion to canon is the upstream-facing decision the curator's report is primarily for.
+Создан PKM-10. Расширен PKM-07 (2026-05-20) добавлением прочёсывания устаревших
+кандидатов, обнаружения сирот и проверки битых wikilink-ов. PKM-10 владеет
+прочёсываниями пространств имён; PKM-07 владеет общей логикой курации. Личные кураторы:
+самый лёгкий вариант, потому что личный репозиторий это рабочее пространство самого
+оператора; продвижение в канон: обращённое апстриму решение, для которого прежде всего
+и предназначен отчёт куратора.
 
-Extended by the Namespace V2 upgrade (2026-05-30) to add canon promotion review, freshness posture by namespace, lint via validate.sh plus fuzzy review, and contradiction surfacing. The V2 sweeps follow the canon contract, the promotion path, and the profile-scoped freshness rule: deterministic checks stay in `validate.sh`, and the curator owns only the fuzzy layer.
+Расширен обновлением Namespace V2 (2026-05-30) добавлением ревью продвижения в канон,
+позиции свежести по пространствам имён, линтинга через validate.sh плюс нечёткое ревью и
+вынесения противоречий. Прочёсывания V2 следуют контракту канона, пути продвижения и
+правилу свежести в масштабе профиля: детерминированные проверки остаются в `validate.sh`,
+а куратор владеет только нечётким слоем.

@@ -1,135 +1,142 @@
-# Infinite Brain OS, Working Repo
+# Infinite Brain OS, рабочий репозиторий (Claude)
 
-This repo is the operating system for running a business with AI agents. You have full
-write autonomy here. Claude Code does the heavy lifting; this file orients it.
+Этот репозиторий: операционная система для ведения бизнеса с помощью ИИ-агентов. Здесь у
+вас полная автономия на запись. Claude Code выполняет тяжёлую работу; этот файл его ориентирует.
 
-If the task touches architecture, routing, knowledge structure, sessions, swarms, or
-planning, orient from this file and the doctrine first.
-
----
-
-## Forced startup for every non-trivial chat
-
-For every non-trivial session that reads or writes repo state, do this before substantive
-work:
-
-1. Read `knowledge/ai-architecture/canon/doctrine-card.md`. It is the compressed operating
-   projection of core-doctrine: the hard rules, the control spine, the entity types, and
-   the drill-down pointers.
-2. If the task touches a knowledge domain, read `_system/retrieval-routing-map.md` and load
-   the namespaces it routes to, entering each through its `INDEX.md`.
-3. For architecture-touching, contract-touching, or canon-touching work,
-   `knowledge/ai-architecture/canon/core-doctrine.md` and `_system/README.md` are mandatory
-   reads.
-4. Start the session ledger unless the task is truly trivial and leaves no durable change.
-
-A trivial task is a one-line factual lookup or a no-file explanation. Hard rule: if the
-task creates, edits, moves, or deletes any file, it is non-trivial.
-
-## Forced session discipline
-
-Unless the task is truly trivial, every chat session uses the `sessions/` layer: register
-under `sessions/active/`, declare a transcript path under `sessions/logs/`, keep running
-notes, write a closeout review under `sessions/reviews/`, then move the record to
-`sessions/closed/`. The contract is `_system/session-ledger-rules.md`; the technique is
-`entities/skills/manage-ai-session.md`.
-
-If a chat operates inside a swarm sprint, dual-write: `sessions/` for the conversation
-trail, `swarms/Sprints/...` for execution artifacts and receipts.
-
-Disposable test artifacts default to `outputs/`, never to knowledge surfaces.
+Если задача касается архитектуры, маршрутизации, структуры знаний, сессий, свармов или
+планирования, сначала ориентируйтесь от этого файла и доктрины.
 
 ---
 
-## The eleven entities
+## Обязательная подготовка для каждого нетривиального чата
 
-Everything you build is one of eleven typed entities:
+Для каждой нетривиальной сессии, которая читает или записывает состояние репозитория,
+сделайте это до содержательной работы:
 
-| Entity | Canonical location | Runtime adapter |
-|--------|--------------------|-----------------|
-| Command | `entities/commands/` | `.claude/commands/`, `.codex/commands/` |
-| Agent | `entities/agents/` | `.claude/agents/`, `.codex/agents/` |
-| Skill | `entities/skills/` | `.claude/skills/`, `.codex/skills/` |
-| Rule | `entities/rules/` | `.claude/rules/` (Codex reads AGENTS.md) |
-| Workflow | agentic in `workflows/`, deterministic in `automations/n8n/` | none |
-| Tool | `tools/` (pointer nodes over bounded capabilities) | none |
-| Knowledge | `knowledge/<namespace>/` | none |
-| Data | `data/` (pointers, never live numbers) | none |
-| Memory | `memory/` (reviewed learnings) | none |
-| Output | `outputs/` (produced artifacts with lineage) | none |
-| Project | `projects/{name}/PLAN.md` | none |
+1. Прочитайте `knowledge/ai-architecture/canon/doctrine-card.md`. Это сжатая операционная
+   проекция core-doctrine: жёсткие правила, опорный стержень, типы сущностей и указатели
+   для углубления.
+2. Если задача касается домена знаний, прочитайте `_system/retrieval-routing-map.md` и
+   загрузите пространства имён, на которые она маршрутизирует, входя в каждое через его
+   `INDEX.md`.
+3. Для работы, затрагивающей архитектуру, контракт или канон, чтение
+   `knowledge/ai-architecture/canon/core-doctrine.md` и `_system/README.md` обязательно.
+4. Запустите сессионный реестр, если только задача не является действительно тривиальной
+   и не оставляет долговечных изменений.
 
-Departments (`departments/`) are assemblies over the ontology, not a twelfth type.
-Executable entities live canonically in `entities/` and are loaded through `.claude/` and
-`.codex/` shims: edit the canonical file, then run `bash sync-adapters.sh`. Never edit a
-shim.
+Тривиальная задача это однострочный фактический запрос или объяснение без файлов.
+Жёсткое правило: если задача создаёт, редактирует, перемещает или удаляет любой файл,
+она нетривиальна.
 
-## Namespace architecture
+## Обязательная дисциплина сессий
 
-Knowledge is namespace-first: the unit is `knowledge/<namespace>/`. Every serious namespace
-shares one base (`INDEX.md`, `canon/`, `playbooks/`, `support/`, `synthesis/`) and declares
-one of eight profiles that adds folders without forking the ontology
-(`_system/namespace-profiles.md`).
+Если задача не является действительно тривиальной, каждая чат-сессия использует слой
+`sessions/`: зарегистрируйте её под `sessions/active/`, объявите путь к транскрипту под
+`sessions/logs/`, ведите рабочие заметки, напишите обзор закрытия под `sessions/reviews/`,
+затем переместите запись в `sessions/closed/`. Контракт: в `_system/session-ledger-rules.md`;
+техника: в `entities/skills/manage-ai-session.md`.
 
-`canon/` is the compressed, operator-approved doctrine an agent loads first. Canon is never
-self-approved by an agent. `synthesis/` is derived thinking; `support/` is provenance only.
-The promotion path is strict: raw source to `support/`, to `synthesis/`, to canon-candidate,
-to canon on operator approval.
+Если чат работает внутри спринта сварма, пишите в два места: `sessions/` для следа
+разговора, `swarms/Sprints/...` для артефактов исполнения и квитанций.
 
-The starter ships three registered surfaces and one reference set:
-
-- `knowledge/ai-architecture/`: the full reference doctrine (read-first).
-- `knowledge/personal-operator/`: the operator's own reduced skeleton (fill it in).
-- `knowledge/emberline-studio/`: the worked example namespace (study, then replace).
-- `knowledge/_examples/`: eight unregistered profile reference scaffolds.
-
-Run `bash _system/validate.sh` to check the vault. When adding a namespace, register it in
-`_system/namespaces/` and follow `entities/skills/build-namespace.md`.
-
-## The lifecycle
-
-Every entity is `scratch` (new, possibly wrong), `research` (validated, worth refining),
-`candidate` (nominated, under review), or `canon` (promoted, operator-approved). Promotion
-moves forward through review, never by an agent's own declaration. In a multi-repo
-deployment (a company canon repo plus personal working repos), `canon` lives upstream; this
-standalone starter holds all four states locally with the same discipline.
-
-## Frontmatter contract
-
-Every node-bearing markdown file opens with YAML frontmatter carrying the eight required
-keys the validator enforces: `id`, `type`, `namespace`, `lifecycle_state`, `summary`,
-`confidence`, `retrieval_class`, and `export_class`, with the id repeated in `aliases`.
-Serious nodes add `edges` and `created`. Ids are kebab-case and stable. Wikilinks must
-resolve. When creating a node, copy the frontmatter shape of a shipped example (for
-instance `knowledge/emberline-studio/concepts/seasonal-collection.md`) rather than
-inventing conventions.
-
-## Hard style rule
-
-No em dashes, no en dashes, anywhere, in any file. Use commas, colons, or restructure the
-sentence. The validator enforces this. No placeholder text above `lifecycle_state: scratch`.
-
-## Retrieval
-
-Agents read git directly via Read, Grep, and Glob. The working tree is the retrieval
-surface; no external index is required. Default order: the doctrine card, then the routing
-map, then namespace INDEX files, then the specific files the task needs: the minimal
-sufficient set, never the whole graph.
-
-## A note on Paperclip
-
-Shipped doctrine refers to Paperclip, the task-and-approval runtime used by the deployment
-this starter derives from. Treat the name as a placeholder for whatever runtime substrate
-you adopt (an issue tracker, a workflow engine, or nothing at all). The git contract stands
-on its own; nothing in this repo requires Paperclip to run.
-
-## What this repo is not
-
-- Not a system of record for numbers: metrics live in your BI stack; `data/` holds pointers.
-- Not a place for raw runtime logs: reviewed lessons become Memory nodes.
-- Not a secret store: `secrets/` holds references, never values.
+Расходные тестовые артефакты по умолчанию уходят в `outputs/`, никогда в поверхности
+знаний.
 
 ---
 
-See `AGENTS.md` for the Codex-equivalent of this file. Both files mirror each other and
-must be edited together.
+## Одиннадцать сущностей
+
+Всё, что вы строите,: одна из одиннадцати типизированных сущностей:
+
+| Сущность | Каноническое расположение | Адаптер времени исполнения |
+|----------|---------------------------|----------------------------|
+| Command (команда) | `entities/commands/` | `.claude/commands/`, `.codex/commands/` |
+| Agent (агент) | `entities/agents/` | `.claude/agents/`, `.codex/agents/` |
+| Skill (навык) | `entities/skills/` | `.claude/skills/`, `.codex/skills/` |
+| Rule (правило) | `entities/rules/` | `.claude/rules/` (Codex читает AGENTS.md) |
+| Workflow (рабочий процесс) | агентные в `workflows/`, детерминированные в `automations/n8n/` | нет |
+| Tool (инструмент) | `tools/` (узлы-указатели над ограниченными возможностями) | нет |
+| Knowledge (знание) | `knowledge/<namespace>/` | нет |
+| Data (данные) | `data/` (указатели, никогда не живые числа) | нет |
+| Memory (память) | `memory/` (проверенные уроки) | нет |
+| Output (результат) | `outputs/` (созданные артефакты с происхождением) | нет |
+| Project (проект) | `projects/{name}/PLAN.md` | нет |
+
+Департаменты (`departments/`) это сборки поверх онтологии, а не двенадцатый тип.
+Исполнимые сущности канонически живут в `entities/` и загружаются через прокладки `.claude/`
+и `.codex/`: отредактируйте канонический файл, затем запустите `bash sync-adapters.sh`.
+Никогда не редактируйте прокладку.
+
+## Архитектура пространств имён
+
+Знания первично по пространствам имён: единица: `knowledge/<namespace>/`. Каждое серьёзное
+пространство имён делит одну базу (`INDEX.md`, `canon/`, `playbooks/`, `support/`,
+`synthesis/`) и объявляет один из восьми профилей, который добавляет папки без форка
+онтологии (`_system/namespace-profiles.md`).
+
+`canon/` это сжатая, утверждённая оператором доктрина, которую агент загружает первой.
+Канон никогда не утверждается самим агентом. `synthesis/`: производное мышление;
+`support/`: только провенанс. Путь продвижения строгий: сырой источник в `support/`,
+затем в `synthesis/`, затем в кандидата в канон, затем в канон по утверждению оператора.
+
+Стартер поставляет три зарегистрированные поверхности и один справочный набор:
+
+- `knowledge/ai-architecture/`: полная эталонная доктрина (читается первой).
+- `knowledge/personal-operator/`: собственный урезанный скелет оператора (заполните его).
+- `knowledge/emberline-studio/`: проработанный пример пространства имён (изучите, затем
+  замените).
+- `knowledge/_examples/`: восемь незарегистрированных справочных каркасов профилей.
+
+Запустите `bash _system/validate.sh`, чтобы проверить хранилище. Добавляя пространство
+имён, зарегистрируйте его в `_system/namespaces/` и следуйте `entities/skills/build-namespace.md`.
+
+## Жизненный цикл
+
+Каждая сущность находится в состоянии `scratch` (новая, возможно ошибочная), `research`
+(проверенная, стоит доработки), `candidate` (выдвинутая, на рассмотрении) или `canon`
+(продвинутая, утверждённая оператором). Продвижение движется вперёд через ревью, никогда
+по собственному заявлению агента. В многолюдном развёртывании (корпоративный репозиторий
+канона плюс личные рабочие репозитории) `canon` живёт апстримом; этот отдельный стартер
+держит все четыре состояния локально с той же дисциплиной.
+
+## Контракт frontmatter
+
+Каждый markdown-файл-узел открывается YAML-frontmatter с восемью обязательными ключами,
+которые требует валидатор: `id`, `type`, `namespace`, `lifecycle_state`, `summary`,
+`confidence`, `retrieval_class` и `export_class`, с id, повторённым в `aliases`. Серьёзные
+узлы добавляют `edges` и `created`. Id в kebab-case и стабильны. Wikilink-ссылки должны
+резолвиться. Создавая узел, копируйте форму frontmatter из поставляемого примера
+(например, `knowledge/emberline-studio/concepts/seasonal-collection.md`), а не изобретайте
+собственные соглашения.
+
+## Жёсткое правило стиля
+
+Никаких тире em, никаких тире en, нигде, ни в одном файле. Используйте запятые, двоеточия
+или перестраивайте предложение. Валидатор это контролирует. Никакого текста-заглушки выше
+`lifecycle_state: scratch`.
+
+## Извлечение
+
+Агенты читают git напрямую через Read, Grep и Glob. Рабочее дерево: поверхность
+извлечения; внешний индекс не требуется. Порядок по умолчанию: карточка доктрины, затем
+карта маршрутизации, затем INDEX-файлы пространств имён, затем конкретные файлы, которые
+нужны задаче: минимально достаточный набор, никогда весь граф.
+
+## Заметка о Paperclip
+
+Поставляемая доктрина ссылается на Paperclip, среду исполнения задач и утверждений,
+используемую деплоем, из которого произошёл этот стартер. Относитесь к имени как к
+заглушке для любой среды-подложки, которую вы примете (трекер задач, движок рабочих
+процессов или ничего вообще). Git-контракт стоит сам по себе; ничто в этом репозитории не
+требует Paperclip для работы.
+
+## Чем этот репозиторий не является
+
+- Не система учёта чисел: метрики живут в вашем BI-стеке; `data/` держит указатели.
+- Не место для сырых логов времени исполнения: проверенные уроки становятся узлами Memory.
+- Не хранилище секретов: `secrets/` держит ссылки, никогда значения.
+
+---
+
+См. `AGENTS.md`: эквивалент этого файла для Codex. Оба файла зеркалят друг друга и
+должны редактироваться вместе.

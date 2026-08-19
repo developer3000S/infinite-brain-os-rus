@@ -21,169 +21,186 @@ edges:
 created: "2026-06-10"
 ---
 
-## What this card is
+## Что это за карточка
 
-This card is a compressed operating projection of [[core-doctrine]], built so a session
-can start with one short read instead of a 13k-word scan. It is not a second doctrine.
-When core-doctrine changes, this card must be re-verified against it, and on any conflict
-core-doctrine wins. Read this card first in every non-trivial session; drill down per the
-pointers at the bottom when the task class demands it.
+Эта карточка: сжатая операционная проекция [[core-doctrine]], построенная так, чтобы
+сессия могла начаться с одного короткого чтения вместо сканирования 13 тысяч слов. Это не
+вторая доктрина. Когда core-doctrine меняется, эту карточку нужно повторно верифицировать
+против него, и при любом конфликте core-doctrine побеждает. Читайте эту карточку первой в
+каждой нетривиальной сессии; углубляйтесь по указателям внизу, когда этого требует класс
+задачи.
 
-## What the brain is
+## Что такое мозг
 
-The Infinite Brain is a git-backed knowledge operating system whose job is to make a
-corpus of knowledge, decisions, and procedures reliably retrievable and safely executable
-by AI agents, today and after the tools change. Its business aim is to make whole
-functions operable as AI-first shadow departments with a thin human layer that keeps
-goals, approvals, and hard exceptions.
+Infinite Brain это операционная система знаний на базе git, чья работа: делать корпус
+знаний, решений и процедур надёжно извлекаемым и безопасно исполняемым ИИ-агентами,
+сегодня и после смены инструментов. Её бизнес-цель: делать целые функции управляемыми как
+теневые департаменты с ИИ на первом месте, с тонким человеческим слоем, который держит
+цели, утверждения и жёсткие исключения.
 
-## The control spine
+## Опорный стержень
 
-**The planning ladder.** All work anchors to one canonical ladder: `initiative`, then
-`project`, then `task`. Specialized execution layers (workflow definition, run, swarm
-sprint, wave) hang off the parent task without changing the ontology. A sprint is never a
-canonical project, sprint folders are never a second backlog, and no cockpit surface may
-redefine the ladder. Swarm launch needs a structurally valid parent task with
-`mode: swarm`, plus a file-backed, human-granted approval receipt.
+**Лестница планирования.** Вся работа привязывается к одной канонической лестнице:
+`initiative`, затем `project`, затем `task`. Специализированные слои исполнения
+(определение рабочего процесса, запуск, спринт сварма, волна) висят на родительской задаче
+без изменения онтологии. Спринт никогда не является каноническим проектом, папки спринтов
+никогда не являются вторым бэклогом, и ни одна кокпит-поверхность не может переопределить
+лестницу. Запуск сварма требует структурно валидной родительской задачи с
+`mode: swarm`, плюс файл-подкреплённой квитанции утверждения, данной человеком.
 
-**The three-plane truth split.** Git-backed canon holds intent, doctrine, rules,
-workflows, and durable summaries: the source of truth for what is known and decided.
-Operational state (live tasks, queues, in-flight approvals, runs, swarm fanout) stays in
-the runtime substrate that owns it; it is mutable and never authoritative about meaning.
-Analytical history (telemetry, throughput, trends) is numbers, not doctrine. Live queue
-state never enters git.
+**Разделение истины по трём плоскостям.** Git-поддержанный канон держит намерение,
+доктрину, правила, рабочие процессы и долговечные сводки: источник истины о том, что
+известно и решено. Операционное состояние (живые задачи, очереди, утверждения в полёте,
+запуски, разветвление сварма) остаётся в среде времени исполнения, которая им владеет; оно
+изменяемо и никогда не авторитетно о смысле. Аналитическая история (телеметрия,
+пропускная способность, тренды) это числа, не доктрина. Живое состояние очередей никогда
+не входит в git.
 
-**The surface boundary.** Every adapter (Obsidian, Claude Code, Codex, n8n, Paperclip,
-sprint folders) is a surface. A surface declares what it reads, what state it may own,
-and what write paths it uses. A surface may own session state, queue and review state,
-and drafts with a writeback path. A surface may never become the only durable home of
-approved knowledge, hide canonical semantics in a private runtime schema, or mutate canon
-without a visible promotion event.
+**Граница поверхности.** Каждый адаптер (Obsidian, Claude Code, Codex, n8n, Paperclip,
+папки спринтов) это поверхность. Поверхность объявляет, что она читает, каким состоянием
+она может владеть и какие пути записи использует. Поверхность может владеть состоянием
+сессии, состоянием очередей и ревью и черновиками с путём записи обратно. Поверхность
+никогда не может стать единственным долговечным домом утверждённого знания, прятать
+каноническую семантику в приватную схему времени исполнения или мутировать канон без
+видимого события продвижения.
 
-**Canon versus synthesis.** Each serious namespace carries `canon/`: the compressed,
-operator-approved, provenance-bearing synthesis an agent loads first. Canon describes the
-system as it runs, carries `derived_from` edges, `verified_at` and `verified_by`, and a
-`## Changelog`. `synthesis/` holds derived thinking, open disputes, and requirements for
-unbuilt capability; `support/` holds provenance only. The promotion path is strict: raw
-source to `support/`, to `synthesis/`, to canon-candidate, to canon on operator approval.
-Knowledge is namespace-first: the unit is `knowledge/<namespace>/`, every serious
-namespace shares one base (`INDEX.md`, `canon/`, `playbooks/`, `support/`, `synthesis/`),
-and one of eight profiles adds folders without forking the ontology. Retrieval is
-designed for the real consumer: a file-reading agent using grep and read over the working
-tree, loading the minimal sufficient set by query class, never the whole graph.
+**Канон против синтеза.** Каждое серьёзное пространство имён несёт `canon/`: сжатый,
+утверждённый оператором синтез с провенансом, который агент загружает первым. Канон
+описывает систему как она работает, несёт рёбра `derived_from`, `verified_at` и
+`verified_by` и `## Changelog`. `synthesis/` держит производное мышление, открытые споры и
+требования к неперестроенной способности; `support/` держит только провенанс. Путь
+продвижения строгий: сырой источник в `support/`, в `synthesis/`, в кандидата-в-канон, в
+канон по утверждению оператора. Знания первично по пространствам имён: единица:
+`knowledge/<namespace>/`, каждое серьёзное пространство имён делит одну базу (`INDEX.md`,
+`canon/`, `playbooks/`, `support/`, `synthesis/`), и один из восьми профилей добавляет
+папки без форка онтологии. Извлечение спроектировано под реального потребителя:
+файловый агент, использующий grep и read по рабочему дереву, загружающий минимально
+достаточный набор по классу запроса, никогда весь граф.
 
-## Hard rules an agent must never violate
+## Жёсткие правила, которые агент никогда не должен нарушать
 
-1. **Session discipline.** Any task that creates, edits, moves, or deletes a file is
-   non-trivial. Register the session under `sessions/active/` before substantive work,
-   declare a transcript path under `sessions/logs/`, keep running notes, write a closeout
-   review under `sessions/reviews/`, and move the record to `sessions/closed/`. If a
-   session operates inside a swarm sprint, dual-write: `sessions/` for the conversation
-   trail, `swarms/Sprints/...` for execution artifacts and receipts.
-2. **No self-approved canon.** Canon is operator-approved, always. An agent drafts at
-   `verified_by: operator-pending`; the operator signs off. Every substantive canon
-   revision gets a one-line dated changelog entry consistent with `verified_at` and
-   `verified_by`. You never edit promoted canon directly; you build here and propose.
-3. **The frontmatter contract.** Every node-bearing markdown file opens with YAML
-   frontmatter carrying at minimum `id`, `type`, `namespace`, and `lifecycle_state`, with
-   the id repeated in `aliases`; serious nodes add `summary`, `confidence`,
-   `retrieval_class`, `export_class`, `edges`, and `created`. Ids are kebab-case and
-   stable. Wikilinks must resolve.
-4. **No em dashes, no en dashes.** Anywhere, in any file. Use commas, colons, or
-   restructure the sentence. No placeholder text (to-be-decided markers, unfinished-work
-   stubs, insert-here brackets) above `lifecycle_state: scratch`.
-5. **Intake routing.** Inbound material flows through `intake/` (source record, routing
-   decision, processed receipt); the destination namespace owns the truth, intake owns
-   only the trail. Disposable test artifacts default to `outputs/`, never to knowledge
-   surfaces. Live connectors and queues stay in the app layer.
-6. **The lifecycle states.** Every entity is `scratch` (new, possibly wrong), `research`
-   (validated, worth refining), `candidate` (nominated, under review), or `canon`
-   (promoted, operator-approved, used by others). Promotion moves forward through review,
-   never by an agent's own declaration.
+1. **Дисциплина сессий.** Любая задача, которая создаёт, редактирует, перемещает или
+   удаляет файл, нетривиальна. Зарегистрируйте сессию под `sessions/active/` до
+   содержательной работы, объявите путь к транскрипту под `sessions/logs/`, ведите рабочие
+   заметки, напишите обзор закрытия под `sessions/reviews/` и переместите запись в
+   `sessions/closed/`. Если сессия работает внутри спринта сварма, пишите в два места:
+   `sessions/` для следа разговора, `swarms/Sprints/...` для артефактов исполнения и
+   квитанций.
+2. **Никакого самопровозглашённого канона.** Канон утверждается оператором, всегда. Агент
+   готовит черновик с `verified_by: operator-pending`; оператор подписывает. Каждая
+   содержательная ревизия канона получает однострочную датированную запись журнала
+   изменений, согласованную с `verified_at` и `verified_by`. Вы никогда не редактируете
+   продвинутый канон напрямую; вы строите здесь и предлагаете.
+3. **Контракт frontmatter.** Каждый markdown-файл-узел открывается YAML-frontmatter, несущим
+   как минимум `id`, `type`, `namespace` и `lifecycle_state`, с id, повторённым в `aliases`;
+   серьёзные узлы добавляют `summary`, `confidence`, `retrieval_class`, `export_class`,
+   `edges` и `created`. Id в kebab-case и стабильны. Wikilink-ссылки должны резолвиться.
+4. **Никаких тире em, никаких тире en.** Нигде, ни в одном файле. Используйте запятые,
+   двоеточия или перестраивайте предложение. Никакого текста-заглушки (маркеров
+   «решить позже», заглушек незаконченной работы, скобок «вставить здесь») выше
+   `lifecycle_state: scratch`.
+5. **Маршрутизация входящих.** Входящий материал проходит через `intake/` (запись
+   источника, решение маршрутизации, квитанция об обработке); пространство имён назначения
+   владеет истиной, intake владеет только следом. Расходные тестовые артефакты по
+   умолчанию уходят в `outputs/`, никогда на поверхности знаний. Живые коннекторы и очереди
+   остаются в прикладном слое.
+6. **Состояния жизненного цикла.** Каждая сущность это `scratch` (новая, возможно
+   ошибочная), `research` (проверенная, стоит доработки), `candidate` (выдвинутая, на
+   рассмотрении) или `canon` (продвинутая, утверждённая оператором, используемая другими).
+   Продвижение движется вперёд через ревью, никогда по собственному заявлению агента.
 
-## Other settled disciplines
+## Другие устоявшиеся дисциплины
 
-- **Two homes for system knowledge.** `_system/` is the operative contract layer: what
-  must be true and how it is checked (registry, schemas, rules, `validate.sh`).
-  `knowledge/ai-architecture/` is the reasoning layer: why it is true. Neither restates
-  the other; each links across. If a change alters what the validator accepts, it belongs
-  in `_system/`; if it changes how someone thinks, it belongs in doctrine.
-- **Correction to structure.** When the operator corrects an agent the same way twice,
-  the correction is absorbed into a rule, playbook, decision, or canon revision. If you
-  would otherwise type the same correction a third time, it belongs in structure.
-- **Harness portability.** Truth lives in plain Markdown and YAML in git, readable by any
-  file-reading agent. Claude Code and Codex are current adapters, not owners; the brain
-  must survive a change of model, client, or vendor.
-- **Deterministic versus agentic.** Deterministic work (n8n JSON, shell, validators) runs
-  where determinism is cheap and is paired with a brain record; agentic reasoning runs
-  where judgment is required. Routing across modes is visible and human-gated; the
-  PM-agent recommends the lowest-cost safe mode but never holds launch authority.
-- **Output linkage.** Every namespace names what outputs its canon drives. Doctrine that
-  improves no real decision, project, or artifact is suspect.
-- **The metric primitive.** A metric is one shared typed node keyed by `metric_id` with
-  definition, lineage, and diagnosis faces, so namespaces talk about the same number.
-- **Public export is a surface.** `llms.txt` is a thin public summary generated from
-  canon, never from raw notes; export stays downstream of canon.
-- **Operating gaps live in synthesis.** Requirements for capability the system does not
-  yet run are tracked in synthesis nodes (see `autonomy-readiness-requirements`), never
-  asserted in canon.
-- **OODA orientation lens and the feedback loop.** Read as Boyd's OODA, the brain's strength is that
-  Orient is externalized (graph, canon, retrieval, skills) and its weakest arrow is Act-to-Orient
-  feedback. The decided design for that arrow is the wager ledger
-  ([[wager-ledger-and-scientific-loop]], contract `_system/wager-ledger-rules.md`): consequential
-  actions carry pre-registered, business-grounded predictions scored against exogenous metrics, and
-  departments own their slice via `owning_department_id`. Decided, not yet built. Operating guide:
-  [[department-operating-guide]].
+- **Два дома для системных знаний.** `_system/`: действующий слой контракта: что должно
+  быть истинно и как это проверяется (реестр, схемы, правила, `validate.sh`).
+  `knowledge/ai-architecture/`: слой рассуждений: почему это истинно. Ни один не
+  пересказывает другой; каждый ссылается на другой. Если изменение меняет то, что
+  принимает валидатор, ему место в `_system/`; если оно меняет то, как кто-то думает, ему
+  место в доктрине.
+- **Исправление в структуру.** Когда оператор исправляет агента одинаково дважды,
+  исправление впитывается в правило, плейбук, решение или ревизию канона. Если вы в
+  противном случае набрали бы то же исправление в третий раз, ему место в структуре.
+- **Портируемость обвязки.** Истина живёт в простых Markdown и YAML в git, читаемых любым
+  файловым агентом. Claude Code и Codex: текущие адаптеры, не владельцы; мозг должен
+  пережить смену модели, клиента или вендора.
+- **Детерминированное против агентного.** Детерминированная работа (n8n JSON, shell,
+  валидаторы) выполняется там, где детерминизм дёшев, и парой с записью мозга; агентные
+  рассуждения выполняются там, где требуется суждение. Маршрутизация между режимами
+  видима и ограничена человеком; PM-агент рекомендует самый дешёвый безопасный режим, но
+  никогда не держит полномочия запуска.
+- **Связь с результатами.** Каждое пространство имён называет, какие результаты водит его
+  канон. Доктрина, которая не улучшает ни одно реальное решение, проект или артефакт,
+  подозрительна.
+- **Примитив метрик.** Метрика это один общий типизированный узел, ключом по `metric_id`,
+  с гранями определения, происхождения и диагностики, чтобы пространства имён говорили об
+  одном и том же числе.
+- **Публичный экспорт это поверхность.** `llms.txt` это тонкая публичная сводка,
+  генерируемая из канона, никогда из сырых заметок; экспорт остаётся ниже по течению от
+  канона.
+- **Операционные пробелы живут в синтезе.** Требования к способности, которую система ещё
+  не запускает, отслеживаются в узлах синтеза (см. `autonomy-readiness-requirements`),
+  никогда не утверждаются в каноне.
+- **Линза ориентации OODA и петля обратной связи.** Читая как OODA Бойда, сильная сторона
+  мозга в том, что Orient экстернализован (граф, канон, извлечение, навыки), а его самая
+  слабая стрелка: обратная связь «Действие-Ориентация». Решённый дизайн для этой стрелки:
+  реестр ставок ([[wager-ledger-and-scientific-loop]], контракт
+  `_system/wager-ledger-rules.md`): существенные действия несут предварительно
+  зарегистрированные, обоснованные бизнесом прогнозы, оцениваемые по экзогенным метрикам,
+  и департаменты владеют своим срезом через `owning_department_id`. Решено, ещё не
+  построено. Операционное руководство: [[department-operating-guide]].
 
-## The eleven entity types
+## Одиннадцать типов сущностей
 
-| Entity | Canonical location | Runtime adapter |
-|--------|--------------------|-----------------|
+| Сущность | Каноническое расположение | Адаптер времени исполнения |
+|----------|---------------------------|----------------------------|
 | Command | `entities/commands/` | `.claude/commands/`, `.codex/commands/` |
 | Agent | `entities/agents/` | `.claude/agents/`, `.codex/agents/` |
 | Skill | `entities/skills/` | `.claude/skills/`, `.codex/skills/` |
-| Rule | `entities/rules/` | `.claude/rules/` (Codex reads AGENTS.md) |
-| Workflow | agentic in `workflows/`, deterministic in `automations/n8n/` | none |
-| Tool | `tools/` (pointer nodes over bounded capabilities) | none |
-| Knowledge | `knowledge/<namespace>/` | none |
-| Data | `data/` (pointers, never live numbers) | none |
-| Memory | `memory/` (reviewed learnings) | none |
-| Output | `outputs/` (produced artifacts with lineage) | none |
-| Project | `projects/{name}/PLAN.md` | none |
+| Rule | `entities/rules/` | `.claude/rules/` (Codex читает AGENTS.md) |
+| Workflow | агентные в `workflows/`, детерминированные в `automations/n8n/` | нет |
+| Tool | `tools/` (узлы-указатели над ограниченными возможностями) | нет |
+| Knowledge | `knowledge/<namespace>/` | нет |
+| Data | `data/` (указатели, никогда не живые числа) | нет |
+| Memory | `memory/` (проверенные уроки) | нет |
+| Output | `outputs/` (созданные артефакты с происхождением) | нет |
+| Project | `projects/{name}/PLAN.md` | нет |
 
-Executable entities (Command, Agent, Skill, Rule) live canonically in `entities/` and are
-loaded through `.claude/` and `.codex/` shims; edit the canonical file, never the shim.
-Departments are assemblies over the ontology (root `departments/`), not a twelfth type.
-Root registries make dependencies explicit: `tools/` for capabilities, `secrets/` for
-secret references (never raw values), `repo-registry/` for cross-repo ownership,
-`intake/` for inbound flow, `sessions/` for the audit trail.
+Исполнимые сущности (Command, Agent, Skill, Rule) канонически живут в `entities/` и
+загружаются через прокладки `.claude/` и `.codex/`; редактируйте канонический файл, никогда
+прокладку. Департаменты: сборки поверх онтологии (корневые `departments/`), не двенадцатый
+тип. Корневые реестры делают зависимости явными: `tools/` для способностей, `secrets/` для
+ссылок на секреты (никогда сырых значений), `repo-registry/` для межрепозиторного
+владения, `intake/` для входящего потока, `sessions/` для журнала аудита.
 
-## Drill down: load X when Y
+## Углубление: загружайте X, когда Y
 
-- Load [[core-doctrine]] (whole) when the task is architecture work: designing or
-  changing the control model, namespaces, canon, retrieval, departments, surfaces, or
-  anything that alters how the brain itself works.
-- Load `_system/README.md` when the task touches the operative contract: what the
-  validator enforces, schema and rule files, the namespace registry, or what a builder
-  must produce. Both core-doctrine and `_system/README.md` are mandatory for
-  architecture-touching, contract-touching, or canon-touching tasks.
-- Load `_system/retrieval-routing-map.md` when the task touches a knowledge domain and
-  you need to select namespaces: it maps task classes to namespace load sequences.
-- Load the namespace `INDEX.md` (then its `canon/agent-load-order.md`) for domain work
-  inside a chosen namespace; the namespace owns its internal load order.
-- Load [[system-overview]] when the question is what the whole OS is and how to navigate
-  it; load the relevant `canon/entities/` file when building or choosing entity type X.
-- Load `_system/canon-layer-schema.md` and `_system/canon-changelog-rules.md` when
-  authoring or revising canon; load `_system/swarm-sprint-rules.md` when scaffolding or
-  closing a sprint; load `sessions/README.md` and
-  `knowledge/ai-architecture/playbooks/open-and-close-ai-session.md` for session
-  mechanics beyond the hard rule above.
+- Загружайте [[core-doctrine]] (целиком), когда задача: архитектурная работа: проектирование
+  или изменение контрольной модели, пространств имён, канона, извлечения, департаментов,
+  поверхностей или чего-либо, что меняет то, как работает сам мозг.
+- Загружайте `_system/README.md`, когда задача касается действующего контракта: что
+  принуждает валидатор, файлы схем и правил, реестр пространств имён или что должен
+  произвести конструктор. И core-doctrine, и `_system/README.md` обязательны для задач,
+  касающихся архитектуры, контракта или канона.
+- Загружайте `_system/retrieval-routing-map.md`, когда задача касается домена знаний и вам
+  нужно выбрать пространства имён: она сопоставляет классы задач с последовательностями
+  загрузки пространств имён.
+- Загружайте `INDEX.md` пространства имён (затем его `canon/agent-load-order.md`) для
+  доменной работы внутри выбранного пространства имён; пространство имён владеет своим
+  внутренним порядком загрузки.
+- Загружайте [[system-overview]], когда вопрос о том, что такое вся ОС и как по ней
+  перемещаться; загружайте релевантный файл `canon/entities/`, когда строите или выбираете
+  тип сущности X.
+- Загружайте `_system/canon-layer-schema.md` и `_system/canon-changelog-rules.md`, когда
+  пишете или пересматриваете канон; загружайте `_system/swarm-sprint-rules.md`, когда
+  создаёте каркас или закрываете спринт; загружайте `sessions/README.md` и
+  `knowledge/ai-architecture/playbooks/open-and-close-ai-session.md` для механики сессий
+  сверх жёсткого правила выше.
 
-## Changelog
+## Журнал изменений
 
-- 2026-06-10: initial card created as the startup projection of core-doctrine
-  (harness-hardening program, doctrine-card-and-routing-map sprint). Operator-approved
-  (the-operator) in the 2026-06-10 working session that commissioned the program.
-- 2026-06-19: added the OODA-lens-and-feedback-loop discipline (wager ledger, department-owned slice).
-  Re-verified against core-doctrine; operator-approved (the-operator) in the 2026-06-19 canonization
-  session.
+- 2026-06-10: создана начальная карточка как стартовая проекция core-doctrine (программа
+  закалки обвязки, спринт карточки доктрины и карты маршрутизации). Утверждено оператором
+  (the-operator) в рабочей сессии 2026-06-10, которая заказала программу.
+- 2026-06-19: добавлена дисциплина линзы OODA и петли обратной связи (реестр ставок, срез,
+  принадлежащий департаменту). Повторно верифицировано против core-doctrine; утверждено
+  оператором (the-operator) в сессии канонизации 2026-06-19.

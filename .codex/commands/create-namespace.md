@@ -36,40 +36,53 @@ local_path: entities/commands/create-namespace.md
 
 # /create-namespace
 
-Create a new namespace file in `_system/namespaces/` with `lifecycle_state: scratch`. Used in personal repos to introduce an ad-hoc namespace for a research session, project area, or governance bucket.
+Создаёт новый файл пространства имён в `_system/namespaces/` с `lifecycle_state: scratch`.
+Используется в личных репозиториях, чтобы ввести специальное пространство имён для
+исследовательской сессии, проектной области или управленческой категории.
 
-## When to use this
+## Когда это использовать
 
-- Starting a new research session that does not fit `research-general` or any other existing namespace.
-- Spinning up a project-area namespace that needs its own governance settings.
-- Carving out a topic-specific namespace inside a personal repo for future promotion review.
+- Начало новой исследовательской сессии, которая не подходит под `research-general` или
+  любое другое существующее пространство имён.
+- Запуск проектного пространства имён, которому нужны собственные управленческие настройки.
+- Выделение тематического пространства имён внутри личного репозитория для будущего
+  рассмотрения продвижения.
 
-## When NOT to use this
+## Когда это НЕ использовать
 
-- The need fits an existing canonical namespace. Use the existing one.
-- You are in a department or company-canon repo. Open a pull request that adds the namespace file directly; do not create scratch namespaces in canon repos.
-- The need is for a topic tag, source channel, or author distinction. Use frontmatter fields (`tags`, `source_channel`, `source_author`) on the affected nodes instead.
-- You want to build a real namespace from an existing corpus or source folder. Use `/build-knowledge-base`, which routes through the V2 profile, canon, synthesis, support, and validation machinery.
+- Потребность подходит под существующее каноническое пространство имён. Используйте его.
+- Вы находитесь в репозитории департамента или корпоративного канона. Откройте pull
+  request, который добавляет файл пространства имён напрямую; не создавайте scratch
+  пространства в канон-репозиториях.
+- Потребность в теге темы, канале источника или различии авторов. Используйте поля
+  frontmatter (`tags`, `source_channel`, `source_author`) на затрагиваемых узлах вместо этого.
+- Вы хотите построить настоящее пространство имён из существующего корпуса или папки
+  источников. Используйте `/build-knowledge-base`, который проходит через механизм
+  профиля V2, канона, синтеза, поддержки и валидации.
 
-## How it works
+## Как это работает
 
-The command prompts the operator for four inputs:
+Команда запрашивает у оператора четыре входа:
 
-1. **Namespace name (slug)**: kebab-case, e.g., `research-llm-agents-2026`, `project-launch-q4`, `competitor-acme`.
-2. **Purpose**: a one-line statement of what this namespace covers.
-3. **Group**: one of `operations`, `research`, `product`, `competitive-intel`, `personal`, or a new group documented in the answer.
-4. **Owner**: the operator's handle (defaults to the personal repo owner).
+1. **Имя пространства имён (slug)**: kebab-case, например, `research-llm-agents-2026`,
+   `project-launch-q4`, `competitor-acme`.
+2. **Назначение**: однострочное утверждение того, что покрывает это пространство имён.
+3. **Группа**: одна из `operations`, `research`, `product`, `competitive-intel`,
+   `personal` или новая группа, документированная в ответе.
+4. **Владелец**: хэндл оператора (по умолчанию владелец личного репозитория).
 
-The command then:
+Затем команда:
 
-1. Verifies the slug does not already exist in `_system/namespaces/` (collision check).
-2. Writes `_system/namespaces/{slug}.md` with the required frontmatter and a stub body.
-3. Appends a row to `_system/namespaces/INDEX.md` under the catalog table and under the relevant by-group section.
-4. Reports the file paths created or modified and reminds the operator to run `bash _system/validate.sh` if validate.sh is installed in this personal repo.
+1. Проверяет, что slug ещё не существует в `_system/namespaces/` (проверка коллизий).
+2. Записывает `_system/namespaces/{slug}.md` с требуемым frontmatter и телом-заглушкой.
+3. Добавляет строку в `_system/namespaces/INDEX.md` в таблицу каталога и в
+   соответствующую секцию по группам.
+4. Сообщает о созданных или изменённых путях файлов и напоминает оператору запустить
+   `bash _system/validate.sh`, если validate.sh установлен в этом личном репозитории.
 
-## Body template
+## Шаблон тела
 
-The generated namespace file uses this body template:
+Сгенерированный файл пространства имён использует этот шаблон тела:
 
 ```markdown
 ---
@@ -119,25 +132,37 @@ When this namespace stabilizes, promote it from scratch to candidate by opening 
 Created by /create-namespace on {today}.
 ```
 
-## Edge cases
+## Крайние случаи
 
-- **Collision with an existing namespace**: the command refuses to overwrite and prompts for a different slug.
-- **Slug contains uppercase letters or spaces**: the command lowercases and slugifies before checking.
-- **Group not in the default list**: the command accepts any non-empty string and prompts the operator to add a by-group section to INDEX.md if the group is brand new in this repo.
-- **`_system/namespaces/` does not exist**: the command creates it along with a fresh INDEX.md, using the canon-template's INDEX.md format as the seed.
-- **INDEX.md does not exist**: the command creates it with a fresh catalog and an entry for the new namespace.
+- **Коллизия с существующим пространством имён**: команда отказывается перезаписывать и
+  запрашивает другой slug.
+- **Slug содержит заглавные буквы или пробелы**: команда приводит к нижнему регистру и
+  слагифицирует перед проверкой.
+- **Группы нет в списке по умолчанию**: команда принимает любую непустую строку и
+  предлагает оператору добавить секцию по группам в INDEX.md, если группа в этом
+  репозитории совсем новая.
+- **`_system/namespaces/` не существует**: команда создаёт его вместе со свежим INDEX.md,
+  используя формат INDEX.md из canon-шаблона как затравку.
+- **INDEX.md не существует**: команда создаёт его со свежим каталогом и записью для
+  нового пространства имён.
 
-## Evidence
+## Доказательства
 
-Derived from the upstream v3 spec's namespace-schema section (PROVENANCE.yml records the
-source lineage). The personal-repo scratch lifecycle for ad-hoc namespaces is the entry point for namespace creation; canon promotion is a separate pull request flow.
+Выведено из секции схемы пространств имён спецификации v3 апстрима (PROVENANCE.yml
+фиксирует происхождение источника). Жизненный цикл scratch в личном репозитории для
+специальных пространств имён это точка входа для создания пространств имён; продвижение
+в канон: отдельный поток pull request'ов.
 
-## Edges
+## Рёбра
 
-`feeds: agent-brain-curator` because scratch-lifecycle namespaces created here are exactly what the curator agent surfaces for promotion or merge review.
+`feeds: agent-brain-curator`, потому что созданные здесь scratch-пространства: ровно то,
+что агент-куратор выносит на рассмотрение продвижения или слияния.
 
-`implements: rule-voice-and-style` because the generated namespace file body respects the no-em-dash rule and the frontmatter-before-body rule.
+`implements: rule-voice-and-style`, потому что тело сгенерированного файла пространства
+имён соблюдает правило без тире em и правило «frontmatter перед телом».
 
-## Notes
+## Примечания
 
-The command is intentionally minimal: it does not auto-generate the body content beyond a stub. Operators are expected to populate the use/do-not-use sections by hand so the namespace policy reflects their actual intent.
+Команда намеренно минимальна: она не генерирует содержимое тела, кроме заглушки.
+Ожидается, что операторы вручную заполнят секции «использовать/не использовать», чтобы
+политика пространства имён отражала их реальное намерение.

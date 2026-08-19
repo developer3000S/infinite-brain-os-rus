@@ -10,7 +10,7 @@ Read this before asking why a node is not appearing in search results.
 **Git is the source of truth, and the working tree is the retrieval surface.**
 
 In v3.1 there is no gbrain installation, no separate index, no MCP server required
-for search. Claude Code and Codex read the local git tree directly using their
+for search. Qwen Code and Codex read the local git tree directly using their
 native primitives: Read, Grep, and Glob. The local clone of this repo plus any
 sibling canon or department repos the user has cloned is the entire retrieval
 surface.
